@@ -50,9 +50,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
     python-ds4drv=0.5.2xenial \
     python-rosdep=0.20.* \
     python-rosinstall=0.7.* \
-    ros-$ROS_DISTRO-jackal-robot=0.5.* \
-    ros-$ROS_DISTRO-robot=1.3.2* \
-    ros-$ROS_DISTRO-ros-base=1.3.2* \
+    ros-kinetic-jackal-robot=0.5.* \
+    ros-kinetic-robot=1.3.2* \
+    ros-kinetic-ros-base=1.3.2* \
     rosbash=1.12.* \
     && rm -rf /var/lib/apt/lists/*
 
