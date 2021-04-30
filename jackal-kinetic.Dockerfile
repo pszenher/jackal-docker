@@ -11,18 +11,32 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Install boilerplate utilities
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
-    apt-transport-https=1.2.* \
-    bridge-utils=1.5-* \
-    build-essential=12.* \
+    \
+    # System packages
+    build-essential \
     ca-certificates=* \
     curl=7.47.* \
-    htop=2.0.* \
+    dhcpcd5=6.10.* \
+    software-properties-common=0.96.20.* \
+    \
+    # Package management packages
+    apt-transport-https=1.2.* \
+    python-pip \
+    python3-pip \
+    \
+    # Linux kernel/init packages
     initramfs-tools=0.122* \
     linux-image-generic=4.4.* \
-    ntpdate=1:4.2.* \
-    openssh-server=1:7.2* \
-    software-properties-common=0.96.20.* \
     systemd-sysv=229-4* \
+    \
+    # Sysadmin tool packages
+    htop=2.0.* \
+    less \
+    openssh-server=1:7.2* \
+    screen \
+    vim \
+    wicd-curses \
+    \
     && rm -rf /var/lib/apt/lists/*
 
 # Add ROS deb package repo
@@ -33,27 +47,22 @@ RUN echo "deb ${ROS_URL}/ros/ubuntu/ xenial main" > /etc/apt/sources.list.d/ros-
 RUN echo "deb ${CLEARPATH_URL}/stable/ubuntu xenial main" > /etc/apt/sources.list.d/clearpath-latest.list &&\
     curl -sSL "${CLEARPATH_URL}/public.key" | apt-key add -
 
-# Install required deb packages
+# Install deb packages from newly installed repos
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
-    # bash-completion \
-    # picocom \
-    # python-pip \
-    # python-wstool \
-    # screen \
-    # squashfs-tools \
-    # swapspace \
-    # usbmount \
-    # wicd-curses \
-    dhcpcd5=6.10.* \
-    python-bloom=0.10.* \
-    python-ds4drv=0.5.2xenial \
+    \
+    # ROS Packages
     python-rosdep=0.20.* \
     python-rosinstall=0.7.* \
-    ros-kinetic-jackal-robot=0.5.* \
+    python-rosinstall-generator \
+    python-wstool \
     ros-kinetic-robot=1.3.2* \
     ros-kinetic-ros-base=1.3.2* \
-    rosbash=1.12.* \
+    \
+    # Clearpath Packages
+    python-ds4drv=0.5.2xenial \
+    ros-kinetic-jackal-robot=0.5.* \
+    \
     && rm -rf /var/lib/apt/lists/*
 
 # Initialize system-wide rosdep
