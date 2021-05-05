@@ -55,7 +55,9 @@ class PackageList:
 
     def add_package(self, package: Package) -> None:
         if package.name in self.packages:
-            raise Exception()
+            raise ValueError(
+                f'Package name "{package.name}" is already in the package list.'
+            )
         self.packages[package.name] = package
         return
 
@@ -66,7 +68,7 @@ class PackageList:
 
     def upgrade_package(self, name: str, version: str) -> None:
         if name not in self.packages:
-            raise Exception()
+            raise ValueError(f'Package name "{name}" is not in the package list.')
         self.packages[name].upgrade_version = version
         return
 
@@ -147,8 +149,9 @@ if __name__ == "__main__":
     for n, v in upgradable.items():
         try:
             packages.upgrade_package(n, v)
-        except Exception:
-            logging.warning(f'Package "{n}" is not in packages list')
+        except ValueError:
+            # Ignore upgradable packages that are not listed in the dockerfile
+            pass
 
     for p in packages.packages.values():
         if p.is_upgradable():
