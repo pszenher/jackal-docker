@@ -148,7 +148,7 @@ if __name__ == "__main__":
         try:
             packages.upgrade_package(n, v)
         except Exception:
-            pass
+            logging.warning(f'Package "{n}" is not in packages list')
 
     for p in packages.packages.values():
         if p.is_upgradable():
