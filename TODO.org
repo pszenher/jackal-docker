@@ -1,0 +1,18 @@
+#+TITLE: TODO Items for jackal-docker
+
+* TODO Project Architecture [0/1]
+  
+** TODO Spin version pinning scripts off into separate package
+   - Should have strong testing coverage with variety of cases for all methods
+
+* TODO Dockerfile Implementation(s) [0/4]
+  
+** TODO Configure network interfaces
+   - Should use device names from jackal ~biosdevname~ (will need to boot physical jackal to test this)
+
+** TODO Implement ROS Melodic Dockerfile
+
+** TODO Implement ROS Noetic Dockerfile
+
+** TODO Add RFAL projects to Dockerfiles
+   - Should include LeGO-LOAM, LIO-SAM, traversability_mapping, etc.
