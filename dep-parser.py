@@ -23,9 +23,11 @@ class Package:
     def gen_apt_string(self) -> str:
         return f"{self.name}{self._get_version_string()}"
 
-    def gen_upgrade_string(self) -> Optional[str]:
+    def gen_upgrade_string(self) -> str:
         if self.upgrade_version is None:
-            return None
+            raise RuntimeError(
+                f'Package "{self.name}" has no upgrade_version to generate.'
+            )
         return f"{self.name}{self._get_upgrade_string()}"
 
     def is_upgradable(self) -> bool:
