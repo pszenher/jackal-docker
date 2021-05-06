@@ -1,18 +1,16 @@
 # Enable postponement of annotation evaluatoin
 from __future__ import annotations
 
-import fileinput
 import json
 import logging
 import re
 import shlex
 import sys
 from dataclasses import dataclass, field
-from pprint import pprint
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, Union
 
-import docker
-from dockerfile_parse import DockerfileParser
+import docker  # type: ignore
+from dockerfile_parse import DockerfileParser  # type: ignore
 
 
 @dataclass
@@ -132,8 +130,7 @@ class AptDockerfileParser(DockerfileParser):
         return pkg_list
 
 
-if __name__ == "__main__":
-
+def main() -> None:
     # Parse target dockerfile
     logging.warning("Parsing dockerfile...")
     dfp = AptDockerfileParser()
@@ -167,8 +164,11 @@ if __name__ == "__main__":
             pass
 
     filename = "jackal-kinetic.Dockerfile"
+    # Read current dockerfile as list of lines
     with open(filename, "r") as dockerfile:
         dockerfile_lines = dockerfile.readlines()
+
+    # Overwrite dockerfile with substituted package versions
     with open(filename, "w") as dockerfile:
         for lnum, line in enumerate(dockerfile_lines):
             if any(map(lambda r: r[0] <= lnum <= r[1], dfp.apt_lines)):
@@ -184,3 +184,7 @@ if __name__ == "__main__":
                     if num_sub >= 1:
                         print(f"{p.gen_apt_string():<40} --> {p.gen_upgrade_string()}")
             dockerfile.write(line)
+
+
+if __name__ == "__main__":
+    main()

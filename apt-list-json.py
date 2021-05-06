@@ -1,7 +1,7 @@
 import argparse
 import json
 
-import apt
+import apt  # type: ignore
 
 
 class CandidateFilter(apt.cache.Filter):
@@ -28,35 +28,42 @@ class UpgradableOrNotInstalledFilter(apt.cache.Filter):
         return pkg.is_upgradable or not pkg.is_installed
 
 
-parser = argparse.ArgumentParser(description="Output json apt list to stdout.")
-parser.add_argument(
-    "-f",
-    "--filter",
-    type=str,
-    metavar="[installed|upgradable|new]",
-    help="Filter to apply to apt package list.",
-)
+def apt_filter(filter_name: str):
+    if args.filter is None:
+        return CandidateFilter()
+    elif args.filter == "installed":
+        return InstalledFilter()
+    elif args.filter == "upgradable":
+        return UpgradableFilter()
+    elif args.filter == "new":
+        return UpgradableOrNotInstalledFilter()
+    else:
+        raise ValueError(f'Filter name "{filter_name}" is not a valid filter.')
 
-args = parser.parse_args()
 
-# Open system apt cache
-full_cache = apt.cache.Cache()
-full_cache.update()
-full_cache.open()
+def main(args: argparse.Namespace) -> None:
+    # Open system apt cache
+    full_cache = apt.cache.Cache()
+    full_cache.update()
+    full_cache.open()
 
-filter_cache = apt.cache.FilteredCache(full_cache)
+    filter_cache = apt.cache.FilteredCache(full_cache)
+    filter_cache.set_filter(args.apt_filter)
 
-if args.filter is None:
-    filter_cache.set_filter(CandidateFilter())
-elif args.filter == "installed":
-    filter_cache.set_filter(InstalledFilter())
-elif args.filter == "upgradable":
-    filter_cache.set_filter(UpgradableFilter())
-elif args.filter == "new":
-    filter_cache.set_filter(UpgradableOrNotInstalledFilter())
-else:
-    raise Exception()
+    package_dict = {pack.shortname: pack.candidate.version for pack in filter_cache}
 
-package_dict = {pack.shortname: pack.candidate.version for pack in filter_cache}
+    print(json.dumps(package_dict))
 
-print(json.dumps(package_dict))
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Output json apt list to stdout.")
+    parser.add_argument(
+        "-f",
+        "--filter",
+        type=apt_filter,
+        metavar="[installed|upgradable|new]",
+        help="Filter to apply to apt package list.",
+    )
+    args = parser.parse_args()
+
+    main(args)
