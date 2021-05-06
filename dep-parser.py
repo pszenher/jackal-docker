@@ -4,6 +4,7 @@ from __future__ import annotations
 import fileinput
 import json
 import logging
+import re
 import shlex
 import sys
 from dataclasses import dataclass, field
@@ -76,18 +77,28 @@ class PackageList:
 
 
 class AptDockerfileParser(DockerfileParser):
-    def apt_packages(self) -> PackageList:
-        run_commands = [
-            cmd["value"] for cmd in self.structure if cmd["instruction"] == "RUN"
+    def __init__(self, *args, **kwargs):
+        super(self.__class__, self).__init__(*args, **kwargs)
+        self._init_apt_packages()
+
+    def _init_apt_packages(self) -> None:
+        apt_commands = [
+            cmd
+            for cmd in self.structure
+            if cmd["instruction"] == "RUN"
+            and re.search(r"(apt|apt-get)\s*install", cmd["value"])
         ]
 
+        self.apt_lines = [(c["startline"], c["endline"]) for c in apt_commands]
+
         packages = PackageList()
-        for command in run_commands:
-            tokens = shlex.shlex(command, posix=True, punctuation_chars=True)
+        for command in apt_commands:
+            command_string = command["value"]
+            tokens = shlex.shlex(command_string, posix=True, punctuation_chars=True)
             tokens.whitespace_split = True
             packages.add_packages(self._parse_apt_install(tokens))
 
-        return packages
+        self.apt_packages = packages
 
     @staticmethod
     def _parse_apt_install(tokens: Iterable[str]) -> PackageList:
@@ -129,12 +140,12 @@ if __name__ == "__main__":
     with open("jackal-kinetic.Dockerfile", "r") as f:
         dfp.content = f.read()
 
-    packages = dfp.apt_packages()
+    packages = dfp.apt_packages
 
     docker_client = docker.from_env()
     stdout = docker_client.containers.run(
         image="jackal-kinetic",
-        command="python3 /apt-list-json.py -f new",
+        command="python3 /apt-list-json.py",
         user="root",
         volumes={
             sys.path[0]
@@ -155,18 +166,21 @@ if __name__ == "__main__":
             # Ignore upgradable packages that are not listed in the dockerfile
             pass
 
-    for p in packages.packages.values():
-        if p.is_upgradable():
-            print(p.gen_upgrade_string())
-
-    # # Perform inplace replacement of old version number in dockerfile
-    # filename = "jackal-kinetic.Dockerfile"
-    # with fileinput.FileInput(filename, inplace=True, backup=".bak") as file:
-    #     for line in file:
-    #         for change in changes:
-    #             print(
-    #                 line.replace(
-    #                     f"{change.name}={change.old_version}",
-    #                     f"{change.name}={change.version}",
-    #                 ).rstrip("\n")
-    #             )
+    filename = "jackal-kinetic.Dockerfile"
+    with open(filename, "r") as dockerfile:
+        dockerfile_lines = dockerfile.readlines()
+    with open(filename, "w") as dockerfile:
+        for lnum, line in enumerate(dockerfile_lines):
+            if any(map(lambda r: r[0] <= lnum <= r[1], dfp.apt_lines)):
+                for p in filter(
+                    lambda x: x.is_upgradable(), packages.packages.values()
+                ):
+                    line, num_sub = re.subn(
+                        # TODO: should check for whitespace around match string
+                        re.escape(p.gen_apt_string()),
+                        p.gen_upgrade_string(),
+                        line,
+                    )
+                    if num_sub >= 1:
+                        print(f"{p.gen_apt_string():<40} --> {p.gen_upgrade_string()}")
+            dockerfile.write(line)
