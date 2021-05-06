@@ -13,29 +13,29 @@ RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
     \
     # System packages
-    build-essential \
-    ca-certificates=* \
-    curl=7.47.* \
-    dhcpcd5=6.10.* \
-    software-properties-common=0.96.20.* \
+    build-essential=12.1ubuntu2 \
+    ca-certificates=20210119~16.04.1 \
+    curl=7.47.0-1ubuntu2.19 \
+    dhcpcd5=6.10.1-1 \
+    software-properties-common=0.96.20.10 \
     \
     # Package management packages
-    apt-transport-https=1.2.* \
-    python-pip \
-    python3-pip \
+    apt-transport-https=1.2.35 \
+    python-pip=8.1.1-2ubuntu0.6 \
+    python3-pip=8.1.1-2ubuntu0.6 \
     \
     # Linux kernel/init packages
-    initramfs-tools=0.122* \
-    linux-image-generic=4.4.* \
-    systemd-sysv=229-4* \
+    initramfs-tools=0.122ubuntu8.17 \
+    linux-image-generic=4.4.0.210.216 \
+    systemd-sysv=229-4ubuntu21.31 \
     \
     # Sysadmin tool packages
-    htop=2.0.* \
-    less \
-    openssh-server=1:7.2* \
-    screen \
-    vim \
-    wicd-curses \
+    htop=2.0.1-1ubuntu1 \
+    less=481-2.1ubuntu0.2 \
+    openssh-server=1:7.2p2-4ubuntu2.10 \
+    screen=4.3.1-2ubuntu0.1 \
+    vim=2:7.4.1689-3ubuntu1.5 \
+    wicd-curses=1.7.4+tb2-1 \
     \
     && rm -rf /var/lib/apt/lists/*
 
@@ -52,16 +52,16 @@ RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
     \
     # ROS Packages
-    python-rosdep=0.20.* \
-    python-rosinstall=0.7.* \
-    python-rosinstall-generator \
-    python-wstool \
-    ros-kinetic-robot=1.3.2* \
-    ros-kinetic-ros-base=1.3.2* \
+    python-rosdep=0.20.1-1 \
+    python-rosinstall=0.7.8-1 \
+    python-rosinstall-generator=0.1.22-1 \
+    python-wstool=0.1.17-1 \
+    ros-kinetic-robot=1.3.2-0xenial-20201103-233358+0000 \
+    ros-kinetic-ros-base=1.3.2-0xenial-20201103-121012+0000 \
     \
     # Clearpath Packages
     python-ds4drv=0.5.2xenial \
-    ros-kinetic-jackal-robot=0.5.* \
+    ros-kinetic-jackal-robot=0.5.1-1xenial-20210310-162855-0500 \
     \
     && rm -rf /var/lib/apt/lists/*
 
