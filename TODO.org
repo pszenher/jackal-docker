@@ -5,22 +5,28 @@
 ** TODO Spin version pinning scripts off into separate package
    - Should have strong testing coverage with variety of cases for all methods
 
-* TODO Dockerfile Implementation(s) [0/7]
+* TODO Dockerfile Implementation(s) [1/7]
 
-** TODO Network interfaces
+** TODO Networking
+*** DONE Fill in ~interfaces~ file
+   - Should contain configuration for Velodyne-connected NIC
+*** TODO Get real device names
    - Should use device names from jackal ~biosdevname~ (will need to boot physical jackal to test this)
 
 ** TODO PS4 Controller
    - Check Clearpath PS4 configruation procedure, ensure that it is replicated/replaced within Dockerfile environments
 
-** TODO GPG Public Key(s)
+** DONE GPG Public Key(s)
    - Add personal public key to ssh ~authorized_keys~ for ~rfal~ user
 
 ** TODO Serial access over null-modem cable
    - Should be able to plug-and-play cable in to any Jackal USB port and receive a working terminal promt
 
-** TODO Add RFAL projects to Dockerfile(s)
-   - Should include LeGO-LOAM, LIO-SAM, traversability_mapping, etc.
+** TODO User catkin workspace
+*** DONE Implement catkin_ws config
+    - Add empty catking workspace to dockerfile
+*** TODO Add RFAL projects to Dockerfile(s)
+    - Should include LeGO-LOAM, LIO-SAM, traversability_mapping, etc.
 
 ** TODO ROS Melodic
    - Implement Dockerfile for ROS Melodic on Ubuntu 18.04
