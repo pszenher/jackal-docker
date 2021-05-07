@@ -2,6 +2,8 @@ FROM ubuntu:xenial-20210416
 
 ENV ROS_DISTRO=kinetic
 
+ARG JACKAL_USER="rfal"
+ARG JACKAL_PASSWORD='$6$lTlXs59jEbj2Je$zZ/eQ5S142JWYrglIpJq8NtDo8uKkIu6WkTcucVWy.7uRk2O/1DOQMMWgLi6/Lkvm1OlkPnKpRFrVXGRM5rNG0'
 ARG ROS_URL="https://mirrors.osuosl.org/pub/ros/packages.ros.org"
 ARG CLEARPATH_URL="https://packages.clearpathrobotics.com"
 
@@ -52,6 +54,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
     \
     # ROS Packages
+    python-catkin-tools=0.6.1-1 \
     python-rosdep=0.20.1-1 \
     python-rosinstall=0.7.8-1 \
     python-rosinstall-generator=0.1.22-1 \
@@ -75,18 +78,32 @@ COPY ./root-filesystem/. /
 RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}" /etc/ros/setup.bash
 
 # Install jackal bringup systemd scripts
+# hadolint ignore=SC1091
 RUN source /etc/ros/setup.bash && \
     /etc/ros/install-ros-bringup.py
 
-# Add rfal user with group memberships and SHA256 hashed password
-RUN useradd -mUG sudo rfal && \
-    echo 'rfal:$6$lTlXs59jEbj2Je$zZ/eQ5S142JWYrglIpJq8NtDo8uKkIu6WkTcucVWy.7uRk2O/1DOQMMWgLi6/Lkvm1OlkPnKpRFrVXGRM5rNG0' \
+# Add $JACKAL_USER user with group memberships and SHA256 hashed password
+RUN useradd -mUG sudo "${JACKAL_USER}" && \
+    echo "${JACKAL_USER}:${JACKAL_PASSWORD}" \
     | chpasswd -e
 
-# Switch to rfal user
-USER rfal
+# Copy home directory contents into $JACKAL_USER home dir and set ownership
+COPY ./home-directory/. "/home/${JACKAL_USER}"
+RUN chown -R "${JACKAL_USER}:${JACKAL_USER}" "/home/${JACKAL_USER}"
+
+# Switch to $JACKAL_USER user
+USER "${JACKAL_USER}"
 
 # Update rosdep as rfal user
 RUN rosdep update
 
+# Build home directory catkin workspace
+# hadolint ignore=SC1091
+RUN source /etc/ros/setup.bash && \
+    catkin build --workspace "/home/${JACKAL_USER}/catkin_ws"
+
+# Set working directory to user home dir
+WORKDIR "/home/${JACKAL_USER}"
+
+# Set default command to bash
 CMD ["/bin/bash"]
