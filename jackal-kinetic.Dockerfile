@@ -71,6 +71,9 @@ RUN rosdep init
 # Merge system folder config files into root filesystem
 COPY ./root-filesystem/. /
 
+# Add ROS_DISTRO env var at insertion point in global setup.bash
+RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}" /etc/ros/setup.bash
+
 # Install jackal bringup systemd scripts
 RUN source /etc/ros/setup.bash && \
     /etc/ros/install-ros-bringup.py

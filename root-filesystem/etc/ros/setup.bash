@@ -8,7 +8,5 @@ export ROBOT_SETUP=/etc/ros/setup.bash
 # for scripts to insert to this file.
 ######
 
-source /.dockerenv
-
 # Pass through to the main ROS workspace of the system.
 source /opt/ros/$ROS_DISTRO/setup.bash
