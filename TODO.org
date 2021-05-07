@@ -14,7 +14,12 @@
    - Should use device names from jackal ~biosdevname~ (will need to boot physical jackal to test this)
 
 ** TODO PS4 Controller
-   - Check Clearpath PS4 configruation procedure, ensure that it is replicated/replaced within Dockerfile environments
+*** DONE Check Clearpath PS4 configruation procedure
+     - ensure that it is replicated/replaced within Dockerfile environments
+*** TODO Get MAC addresses of all PS4 controllers
+    - Will require trip to lab
+*** TODO Examine bluetoothctl config
+    - Determine if configuration can be saved directly instead of running bluetoothctl commands
 
 ** DONE GPG Public Key(s)
    - Add personal public key to ssh ~authorized_keys~ for ~rfal~ user
