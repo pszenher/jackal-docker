@@ -46,6 +46,8 @@
 *** TODO Fix catkin ws installation
     - Modify each installed package and fix install definitions
     - Could instead install locally to ~/etc/ros/catkin_ws~ and source ~devel/setup.bash~
+*** TODO Add non-RFAL projects
+    1. TagSLAM
 
 ** TODO Other ROS Versions
 *** TODO ROS Melodic
