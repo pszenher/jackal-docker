@@ -4,6 +4,7 @@ ENV ROS_DISTRO=kinetic
 
 ARG JACKAL_USER="rfal"
 ARG JACKAL_PASSWORD='$6$lTlXs59jEbj2Je$zZ/eQ5S142JWYrglIpJq8NtDo8uKkIu6WkTcucVWy.7uRk2O/1DOQMMWgLi6/Lkvm1OlkPnKpRFrVXGRM5rNG0'
+
 ARG ROS_URL="https://mirrors.osuosl.org/pub/ros/packages.ros.org"
 ARG CLEARPATH_URL="https://packages.clearpathrobotics.com"
 
@@ -53,7 +54,7 @@ RUN echo "deb ${CLEARPATH_URL}/stable/ubuntu xenial main" > /etc/apt/sources.lis
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
     \
-    # ROS Packages
+    # Jackal ROS Packages
     python-catkin-tools=0.6.1-1 \
     python-rosdep=0.20.1-1 \
     python-rosinstall=0.7.8-1 \
@@ -62,14 +63,14 @@ RUN DEBIAN_FRONTEND=noninteractive \
     ros-kinetic-robot=1.3.2-0xenial-20201103-233358+0000 \
     ros-kinetic-ros-base=1.3.2-0xenial-20201103-121012+0000 \
     \
-    # Clearpath Packages
+    # Jackal Clearpath Packages
     python-ds4drv=0.5.2xenial \
     ros-kinetic-jackal-robot=0.5.1-1xenial-20210310-162855-0500 \
     \
+    # Dependencies: la3dm
+    ros-kinetic-octomap-mapping \
+    \
     && rm -rf /var/lib/apt/lists/*
-
-# Initialize system-wide rosdep
-RUN rosdep init
 
 # Merge system folder config files into root filesystem
 COPY ./root-filesystem/. /
@@ -77,12 +78,27 @@ COPY ./root-filesystem/. /
 # Add ROS_DISTRO env var at insertion point in global setup.bash
 RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}" /etc/ros/setup.bash
 
-# Install jackal bringup systemd scripts
+# Initialize system-wide rosdep
+RUN rosdep init
+
+# Clone source code for github packages
+RUN mkdir -p /etc/ros/catkin_ws/{src,deps} && \
+    git clone --branch "4.0.2" "https://github.com/borglab/gtsam" "/etc/ros/catkin_ws/deps/gtsam" && \
+    git clone "https://github.com/pszenher/LIO-SAM" "/etc/ros/catkin_ws/src/LIO-SAM" && \
+    git clone "https://github.com/RobustFieldAutonomyLab/BGK_traversability_mapping" "/etc/ros/catkin_ws/src/BGK_traversability_mapping" && \
+    git clone "https://github.com/RobustFieldAutonomyLab/LeGO-LOAM" "/etc/ros/catkin_ws/src/LeGO-LOAM" && \
+    git clone "https://github.com/RobustFieldAutonomyLab/la3dm" "/etc/ros/catkin_ws/src/la3dm"
+
+# Build ROS packages from source, install ROS bringup launch files
 # hadolint ignore=SC1091
 RUN source /etc/ros/setup.bash && \
+    cmake -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF -DGTSAM_USE_SYSTEM_EIGEN=ON "/etc/ros/catkin_ws/deps/gtsam" -B"/etc/ros/catkin_ws/deps/gtsam/build" && \
+    make -j4 -C "/etc/ros/catkin_ws/deps/gtsam/build" install && \
+    catkin config --workspace "/etc/ros/catkin_ws" --install-space "/opt/ros/${ROS_DISTRO}" --install && \
+    catkin build --workspace "/etc/ros/catkin_ws" && \
     /etc/ros/install-ros-bringup.py
 
-# Add $JACKAL_USER user with group memberships and SHA256 hashed password
+# Add $JACKAL_USER user with group memberships and hashed password
 RUN useradd -mUG sudo "${JACKAL_USER}" && \
     echo "${JACKAL_USER}:${JACKAL_PASSWORD}" \
     | chpasswd -e
@@ -100,6 +116,7 @@ RUN rosdep update
 # Build home directory catkin workspace
 # hadolint ignore=SC1091
 RUN source /etc/ros/setup.bash && \
+    mkdir -p "/home/${JACKAL_USER}/catkin_ws/src" && \
     catkin build --workspace "/home/${JACKAL_USER}/catkin_ws"
 
 # Set working directory to user home dir

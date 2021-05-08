@@ -5,8 +5,10 @@
 ** TODO Spin version pinning scripts off into separate package
    - Should have strong testing coverage with variety of cases for all methods
 
-* TODO Dockerfile Implementation(s) [1/7]
+* TODO Dockerfile Implementation(s) [1/8]
 
+** DONE GPG Public Key(s)
+   - Add personal public key to ssh ~authorized_keys~ for ~rfal~ user
 ** TODO Networking
 *** DONE Fill in ~interfaces~ file
    - Should contain configuration for Velodyne-connected NIC
@@ -21,20 +23,36 @@
 *** TODO Examine bluetoothctl config
     - Determine if configuration can be saved directly instead of running bluetoothctl commands
 
-** DONE GPG Public Key(s)
-   - Add personal public key to ssh ~authorized_keys~ for ~rfal~ user
-
 ** TODO Serial access over null-modem cable
    - Should be able to plug-and-play cable in to any Jackal USB port and receive a working terminal promt
+
+*** TODO Test null-modem cable between PC and laptop
+    - should find lightweight terminal application for interfacing with serial terminal
+
+*** TODO Ensure cable will work out of box on hardware
+    - Check for any required software packages/kernel config
+
+*** TODO Test on Jackal hardware
+    - Test use of cable on Jackal
 
 ** TODO User catkin workspace
 *** DONE Implement catkin_ws config
     - Add empty catking workspace to dockerfile
-*** TODO Add RFAL projects to Dockerfile(s)
-    - Should include LeGO-LOAM, LIO-SAM, traversability_mapping, etc.
+*** DONE Add RFAL projects to Dockerfile(s)
+    - Should include LeGO-LOAM, LIO-SAM, traversability_mapping, la3dm, etc.
+*** TODO Add current RFAL projects
+    - Ask Frankie for his graph-learning work
+    - Ask Erik for his mapping work
+*** TODO Fix catkin ws installation
+    - Modify each installed package and fix install definitions
+    - Could instead install locally to ~/etc/ros/catkin_ws~ and source ~devel/setup.bash~
 
-** TODO ROS Melodic
+** TODO Other ROS Versions
+*** TODO ROS Melodic
    - Implement Dockerfile for ROS Melodic on Ubuntu 18.04
 
-** TODO ROS Noetic
+*** TODO ROS Noetic
    - Implement Dockerfile for ROS Noetic on Ubuntu 20.04
+
+*** TODO ROS 2
+    - Consider producing Jackal configuration for ROS 2
