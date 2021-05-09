@@ -74,6 +74,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
     # Dependencies: la3dm
     ros-kinetic-octomap-mapping \
     \
+    # Dependencies: spin_hokuyo
+    ros-kinetic-laser-geometry \
+    \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -102,6 +105,8 @@ RUN mkdir -p /etc/ros/catkin_ws/{src,deps} && \
     git clone "https://github.com/RobustFieldAutonomyLab/BGK_traversability_mapping" "/etc/ros/catkin_ws/src/BGK_traversability_mapping" && \
     git clone "https://github.com/RobustFieldAutonomyLab/LeGO-LOAM" "/etc/ros/catkin_ws/src/LeGO-LOAM" && \
     git clone "https://github.com/RobustFieldAutonomyLab/la3dm" "/etc/ros/catkin_ws/src/la3dm"
+# TODO: review spin_hokuyo library dependencies to allow install
+# git clone "https://github.com/RobustFieldAutonomyLab/spin_hokuyo" "/etc/ros/catkin_ws/src/spin_hokuyo"
 
 # Build ROS packages from source, install ROS bringup launch files
 # hadolint ignore=SC1091
