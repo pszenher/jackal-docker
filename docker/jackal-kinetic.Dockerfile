@@ -87,8 +87,9 @@ RUN DEBIAN_FRONTEND=noninteractive \
 # Merge system folder config files into root filesystem
 COPY ./root-filesystem/. /
 
-# Add ROS_DISTRO env var at insertion point in global setup.bash
-RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}" /etc/ros/setup.bash
+# Add configuration at insertion point in global setup.bash
+RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}" /etc/ros/setup.bash && \
+    sed -i '/^######$/i source /etc/ros/catkin_ws/devel/setup.bash' /etc/ros/setup.bash
 
 # Initialize system-wide rosdep
 RUN rosdep init
@@ -113,7 +114,8 @@ RUN mkdir -p /etc/ros/catkin_ws/{src,deps} && \
 RUN source /etc/ros/setup.bash && \
     cmake -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF -DGTSAM_USE_SYSTEM_EIGEN=ON "/etc/ros/catkin_ws/deps/gtsam" -B"/etc/ros/catkin_ws/deps/gtsam/build" && \
     make -j4 -C "/etc/ros/catkin_ws/deps/gtsam/build" install && \
-    catkin config --workspace "/etc/ros/catkin_ws" --install-space "/opt/ros/${ROS_DISTRO}" --install && \
+    # TODO: fix package installation configuration in each package
+    # catkin config --workspace "/etc/ros/catkin_ws" --install-space "/opt/ros/${ROS_DISTRO}" --install && \
     catkin build --workspace "/etc/ros/catkin_ws" && \
     /etc/ros/install-ros-bringup.py
 
