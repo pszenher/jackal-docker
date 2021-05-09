@@ -11,6 +11,11 @@ ARG CLEARPATH_URL="https://packages.clearpathrobotics.com"
 USER root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+
+# ====================================================================
+# | Package Management and Configuration                             |
+# ====================================================================
+
 # Install boilerplate utilities
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
@@ -72,6 +77,11 @@ RUN DEBIAN_FRONTEND=noninteractive \
     \
     && rm -rf /var/lib/apt/lists/*
 
+
+# ====================================================================
+# | Root Filesystem Configuration                                    |
+# ====================================================================
+
 # Merge system folder config files into root filesystem
 COPY ./root-filesystem/. /
 
@@ -80,6 +90,11 @@ RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}" /etc/ros/setup.bash
 
 # Initialize system-wide rosdep
 RUN rosdep init
+
+
+# ====================================================================
+# | Source Packages Compilation/Installation                         |
+# ====================================================================
 
 # Clone source code for github packages
 RUN mkdir -p /etc/ros/catkin_ws/{src,deps} && \
@@ -97,6 +112,11 @@ RUN source /etc/ros/setup.bash && \
     catkin config --workspace "/etc/ros/catkin_ws" --install-space "/opt/ros/${ROS_DISTRO}" --install && \
     catkin build --workspace "/etc/ros/catkin_ws" && \
     /etc/ros/install-ros-bringup.py
+
+
+# ====================================================================
+# | User Configuration                                               |
+# ====================================================================
 
 # Add $JACKAL_USER user with group memberships and hashed password
 RUN useradd -mUG sudo "${JACKAL_USER}" && \
