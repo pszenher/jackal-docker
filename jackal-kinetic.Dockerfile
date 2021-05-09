@@ -47,12 +47,11 @@ RUN DEBIAN_FRONTEND=noninteractive \
     \
     && rm -rf /var/lib/apt/lists/*
 
-# Add ROS deb package repo
+# Add ROS and Clearpath deb package repos
 RUN echo "deb ${ROS_URL}/ros/ubuntu/ xenial main" > /etc/apt/sources.list.d/ros-latest.list &&\
-    curl -sSL "${ROS_URL}/ros.key" | apt-key add -
-
-# Add Clearpath deb package repo
-RUN echo "deb ${CLEARPATH_URL}/stable/ubuntu xenial main" > /etc/apt/sources.list.d/clearpath-latest.list &&\
+    curl -sSL "${ROS_URL}/ros.key" | apt-key add - \
+    && \
+    echo "deb ${CLEARPATH_URL}/stable/ubuntu xenial main" > /etc/apt/sources.list.d/clearpath-latest.list &&\
     curl -sSL "${CLEARPATH_URL}/public.key" | apt-key add -
 
 # Install deb packages from newly installed repos
