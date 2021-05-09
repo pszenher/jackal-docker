@@ -49,11 +49,14 @@
 ** TODO Serial access over null-modem cable
    - Should be able to plug-and-play cable in to any Jackal USB port and receive a working terminal promt
 
-*** TODO Test null-modem cable between PC and laptop
+*** DONE Test null-modem cable between PC and laptop
     - should find lightweight terminal application for interfacing with serial terminal
+      - Server side: ~agetty~ invoked via systemd's ~serial-getty@.service~
+      - Client side: ~screen~ or ~picocom~
 
-*** TODO Ensure cable will work out of box on hardware
+*** DONE Ensure cable will work out of box on hardware
     - Check for any required software packages/kernel config
+      - use ~udev~ rule that matches null modem device
 
 *** TODO Test on Jackal hardware
     - Test use of cable on Jackal
