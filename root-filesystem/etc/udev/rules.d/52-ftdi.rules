@@ -1,1 +1,5 @@
+# Set low-latency mode for sensor payloads communicating over usb-serial connections
 SUBSYSTEM=="tty", KERNEL=="ttyUSB[0-9]*", ATTRS{idProduct}=="6001", ATTRS{idVendor}=="0403", MODE="0666", RUN+="/bin/bash -c 'echo 1 > /sys$devpath/device/latency_timer'", SYMLINK+="ftdi_%s{serial}"
+
+# Invoke systemd serial-getty for null modem cable
+SUBSYSTEM=="tty", KERNEL=="ttyUSB[0-9]*", ATTRS{idProduct}=="6001", ATTRS{idVendor}=="0403", ATTRS{product}=="USB Null Modem Cable", MODE="0620", TAG+="systemd", ENV{SYSTEMD_WANTS}="serial-getty@%k.service", ACTION="add"
