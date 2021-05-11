@@ -26,6 +26,8 @@ function usage () {
 
 function ask () {
     # General-purpose y-or-n function
+    # Usage:
+    #     ask ${prompt} ${Y|N}
     # Reference: https://gist.github.com/davejamesmiller/1965569
     local prompt default reply
     if [[ ${2:-} = 'Y' ]]; then
@@ -55,29 +57,51 @@ function ask () {
     done
 }
 
-function log () {
-    if [ -n "${debug-}" ]; then
-        line_prefix="${0}: Line ${BASH_LINENO[0]}, Function ${FUNCNAME[1]}() -->"
-    else
-        line_prefix="${0}:"
+function check_pos_args () {
+    # Assert num passed args = num expected, else return nonzero
+    # Usage:
+    #     check_pos_args ${nargs} ${nspec}
+
+    if [[ "${FUNCNAME[1]}" != "${FUNCNAME[0]}" ]]; then
+        check_pos_args ${#} 2
     fi
-    echo "${line_prefix} ${1}" >&2
+
+    if [[ "${1}" != "${2}" ]]; then
+        logerror "Error: ${FUNCNAME[1]}: exactly ${2} positional arguments required,"\
+                 "${1} provided"
+        return 1
+    fi
+}
+function logsuccess() { log "$(tput setaf 2)[SUCCESS]: ${*}$(tput sgr0)" ; }
+function loginfo()  { log "[INFO]: ${*}" ; }
+function logwarn()  { log "$(tput setaf 3)[WARN]: ${*}$(tput sgr0)" ; }
+function logerror() { log "$(tput setaf 1)[ERROR]: ${*}$(tput sgr0)" ; }
+function log () {
+    # local red green reset
+    # red=$(tput setaf 1); green=$(tput setaf 2); reset=$(tput sgr0)
+
+    if [ -n "${debug-}" ]; then
+        line_prefix=$(printf "${0}: %3d-%-10s --> " "${BASH_LINENO[0]}" "${FUNCNAME[1]}()")
+    else
+        line_prefix=""
+    fi
+    printf "${line_prefix}${*}\n" >&2
 }
 
 function cleanup () {
     if [ -n "${loopback_dev-}" ]; then
-        log "Unmounting disk image device ${loopback_dev}..."
+        loginfo "Unmounting disk image device ${loopback_dev}..."
         sudo umount "${loopback_dev}" && sync
         sudo losetup -d "${loopback_dev}"
     fi
 
     if [ -d "${mount_dir-}" ]; then
-        log "Removing mount dir ${mount_dir}..."
+        loginfo "Removing mount dir ${mount_dir}..."
         rm -d "${mount_dir}"
     fi
 
     if [ -n "${docker_container-}" ]; then
-        log "Removing temporary docker container..."
+        loginfo "Removing temporary docker container..."
         docker container rm "${docker_container}"
     fi
 }
@@ -92,22 +116,17 @@ function init_disk_image () {
     # Initialize ${filename} disk image
     # Usage:
     #     init_disk_image ${filename} ${filesize}
+    check_pos_args ${#} 2
 
-    local numargs filename filesize
-    numargs=2
-    if [[ ${#} -ne ${numargs} ]]; then
-        log "Error: ${FUNCNAME[0]}: exactly ${numargs} positional arguments required,"\
-            "${#} provided"
-        return 1
-    fi
+    local filename filesize
     filename=${1};filesize=${2}
 
     # If target image filename doesn't exist, create the file
     if [ ! -e "${filename}" ]; then
-        log "Info: Image file ${filename} does not yet exist, creating"
+        loginfo "Image file ${filename} does not yet exist, creating"
         truncate -s "${filesize}" "${filename}"
     fi
-   
+
 }
 
 function init_disk_partitions () {
@@ -115,55 +134,46 @@ function init_disk_partitions () {
     # Usage:
     #     init_disk_partition ${filename}
 
-    local numargs filename disk_model
-    numargs=1
-    if [[ ${#} -ne ${numargs} ]]; then
-        log "Error: ${FUNCNAME[0]}: exactly ${numargs} positional arguments required,"\
-            "${#} provided"
-        return 1
-    fi
+    local filename disk_model file_details
+    check_pos_args ${#} 1
+
     filename=${1}
 
     if [ -z "${filename-}" ]; then
-        log "Error: No image filename provided"
+        logerror "No image filename provided"
         exit 1
     fi
 
     if [ -b "${filename}" ]; then
-        log "Info: Image file ${filename} is a block device, using physical disk methods"
-
+        loginfo "Image file ${filename} is a block device, using physical disk methods"
         disk_model=$(udevadm info "${filename}" -q property | sed -rn 's/^ID_MODEL=//;T;p')
-        log "Warning: this action will erase ALL DATA on disk ${filename} (${disk_model})"
-        if ! ask "Are you sure?" "N"; then
-            log "Warning: disk partitioning cancelled, exiting"
-            exit 1
-        fi
-        
-        log "Info: Writing partition table to disk image"
-        echo "2048 + L *" | sudo sfdisk -q -w always "${filename}"
+        file_details="block device ${filename} (${disk_model})"
     elif [ -f "${filename}" ]; then
-        log "Info: Image file ${filename} is a regular file, using disk image methods"
-        
-        log "Info: Writing partition table to disk image"
-        echo "2048 + L *" | sfdisk -q -w always "${filename}"
+        loginfo "Image file ${filename} is a regular file, using disk image methods"
+        file_details="image file ${filename}"
     else
-        log "Error: Image file is neither a block device nor a regular file"
+        logerror "Image file is neither a block device nor a regular file"
         exit 1
     fi
+
+    logwarn "this action will erase ALL DATA on ${file_details}"
+    if ! ask "Are you sure?" "N"; then
+        logwarn "disk partitioning cancelled, exiting"
+        exit 1
+    fi
+
+    loginfo "Writing partition table to disk image"
+    echo "label: dos" | sudo sfdisk "${filename}"
+    echo "start=2048, type=83, bootable" | sudo sfdisk "${filename}"
 }
 
 function init_system_hostname () {
     # Set hostname ${hostname} of filesystem at ${rootdir}
     # Usage:
     #     init_system_hostname ${hostname} ${rootdir}
+    check_pos_args ${#} 2
 
-    local numargs hostname rootdir
-    numargs=2
-    if [[ ${#} -ne ${numargs} ]]; then
-        log "Error: ${FUNCNAME[0]}: exactly ${numargs} positional arguments required,"\
-            "${#} provided"
-        return 1
-    fi
+    local hostname rootdir
     hostname=${1}; rootdir=${2}
 
     echo "${hostname}" | sudo tee "${rootdir}/etc/hostname" > /dev/null
@@ -173,46 +183,59 @@ function init_system_hostname () {
 EOF
 }
 
-function main () {
-    log "Info: Initializing disk image"
-    init_disk_image "${file_name}" "${image_file_size}"
-    
-    log "Info: Initializing disk partitions"
-    init_disk_partitions "${file_name}"
+function init_disk_mount () {
+    # Initialize ${partition} disk mount location and mount
+    # Usage:
+    #     init_disk_mount ${partition} ${mountdir}
 
-    log "Info: Configuring loopback block device for disk image"
-    loopback_dev=$(sudo losetup -o $((512 * 2048)) -f "${file_name}" --show)
-    log "Info: Loopback device configured, \"${loopback_dev}\""
+    check_pos_args ${#} 2
 
-    if [ ! -e "${mount_dir}" ]; then
-        mkdir -p "${mount_dir}"
-    elif [ ! -d "${mount_dir}" ]; then
-        log "Error: Target mount dir ${mount_dir} is not a directory"
+    local partition mountdir;
+    partition=${1}; mountdir=${2}
+
+    if [ ! -e "${mountdir}" ]; then
+        mkdir -p "${mountdir}"
+    elif [ ! -d "${mountdir}" ]; then
+        logerror "Target mount dir ${mountdir} is not a directory"
         exit 1
     fi
 
-    log "Info: Formatting disk partition as ext4"
+    loginfo "Mounting formatted disk partition at ${mountdir}"
+    sudo mount -t ext4 "${partition}" "${mountdir}"
+}
+
+function main () {
+    loginfo "Initializing disk image"
+    init_disk_image "${file_name}" "${image_file_size}"
+
+    loginfo "Initializing disk partitions"
+    init_disk_partitions "${file_name}"
+
+    loginfo "Configuring loopback block device for disk image"
+    loopback_dev=$(sudo losetup -o $((512 * 2048)) -f "${file_name}" --show)
+    loginfo "Loopback device configured, \"${loopback_dev}\""
+
+    loginfo "Formatting disk partition as ext4"
     sudo mkfs.ext4 -q "${loopback_dev}"
 
-    log "Info: Mounting formatted disk partition at ${mount_dir}"
-    sudo mount -t ext4 "${loopback_dev}" "${mount_dir}"
-    
-    log "Copying filesystem from docker image to disk image..."
+    init_disk_mount "${loopback_dev}" "${mount_dir}"
+
+    loginfo "Copying filesystem from docker image to disk image..."
     docker_container=$(docker run -d "${image_name}" /bin/true)
     docker export "${docker_container}" \
         | pv -ptebars "$(docker image inspect "${image_name}" | jq '.[0].Size')" \
         | sudo tar -xf - -X exclude.txt -C "${mount_dir}"
 
-    log "Writing system hostname \"${system_hostname}\" to disk image..."
+    loginfo "Writing system hostname \"${system_hostname}\" to disk image..."
     init_system_hostname "${system_hostname}" "${mount_dir}"
-    
-    log "Installing extlinux bootloader on disk image..."
+
+    loginfo "Installing extlinux bootloader on disk image..."
     sudo extlinux --install "${mount_dir}"/boot
 
-    log "Writing syslinux mbr to disk image..."
-    sudo dd if=/usr/lib/syslinux/mbr/mbr.bin of="${file_name}" bs=440 count=1 conv=notrunc status=none 
+    loginfo "Writing syslinux mbr to disk image..."
+    sudo dd if=/usr/lib/syslinux/mbr/mbr.bin of="${file_name}" bs=440 count=1 conv=notrunc status=none
 
-    log "Success: disk image creation complete..."
+    logsuccess "disk image creation complete..."
 
 }
 
@@ -226,7 +249,7 @@ trap "catch" EXIT
 # shellcheck disable=SC2251
 ! getopt --test > /dev/null
 if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
-    log "Error: 'getopt --test' failed, cannot parse arguments"
+    logerror "'getopt --test' failed, cannot parse arguments"
     exit 1
 fi
 
@@ -275,7 +298,7 @@ while true; do
             break
             ;;
         *)
-            log "Error: Case statement doesn't match getopt for arg: ${1}, exiting"
+            logerror "Case statement doesn't match getopt for arg: ${1}, exiting"
             exit 1
             ;;
     esac
@@ -283,12 +306,10 @@ done
 
 # Handle positional argument
 if [[ ${#} -ne 2 ]]; then
-    log "Error: exactly 2 positional arguments required, ${#} provided"
+    logerror "exactly 2 positional arguments required, ${#} provided"
     usage
     exit 1
 fi
 
-image_name=${1}
-file_name=${2}
-
+image_name=${1}; file_name=${2}
 main
