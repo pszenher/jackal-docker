@@ -1,0 +1,26 @@
+name: Apt Pin Versions
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * MON'
+jobs:
+  update-versions:
+    name: Update Apt Versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+        repository: ${{ github.repository }}
+        ref: "master"
+        path: 'repo'
+      - name: Run Dependency Parser
+        run: python3 repo/scripts/dep-parser.py
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.9.1
+        with:
+          title: Update Pinned Apt Versions
+          body: Update Dockerfile apt version pins to latest version available
+          commit-message: update jackal-kinetic.Dockerfile pinned apt versions
+          branch: update-apt
