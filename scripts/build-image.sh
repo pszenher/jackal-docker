@@ -162,6 +162,7 @@ function catch () {
     # Handler function for trapping process signals
     # Usage:
     #     trap "catch" EXIT
+
     exit_code=${?}
     cleanup
     exit ${exit_code}
