@@ -85,27 +85,31 @@
 *** TODO ROS 2
     - Consider producing Jackal configuration for ROS 2
 
-* TODO Image Export Script(s) [0/6]
+* TODO Image Export Script(s) [5/6]
 
-** TODO Remove calls as root user
-   - should not need to use kernel drivers to mount loopback devices and init an ext4 fs
-   - look into ~guestmount~
+** +Remove calls as root user+
+   - +should not need to use kernel drivers to mount loopback devices and init an ext4 fs+
+   - +look into ~guestmount~+
+   - this doesn't work, root is required for copying root-owned files from docker to a ext4 fs
 
-** TODO Enable dynamic sizing of partition table
+** DONE Enable dynamic sizing of partition table
    - should not rely on hardcoded ~partition-table.conf~
    - check if can be done with ~sfidsk~, otherwise look for other utilities
      - ~fdisk~ can almost certainly accomplish this, but would require the esoteric macro-like syntax wherein the key commands a user would press are used as input
 
-** TODO Refine/remove ~exclude.txt~
+** DONE Refine/remove ~exclude.txt~
    - ideally remove standalone file and roll into inline variable in script(s)
    - check to see if any other directories can be ignored upon docker export
 
-** TODO Restructure ~build-image.sh~ script
+** DONE Restructure ~build-image.sh~ script
    - create functions for each group of actions
    - parse command-line args
 
-** TODO Add support for flashing physical mSata HDD directly
+** DONE Add support for flashing physical mSata HDD directly
    - should be able to format and write to a physical disk without the itermediate ~raw~ disk image stage
 
 ** TODO Implement testing of output image
    - use qemu to sanity check (does image boot, have an init, etc.)
+** DONE Reduce unformatted writes to stderr
+   - utilities run within the script should have output suppressed when ~debug~ flag is not passed
+   - can also format output using ~log~ function if structure is amenable to that

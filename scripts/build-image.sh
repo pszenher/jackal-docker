@@ -60,48 +60,86 @@ function ask () {
 function check_pos_args () {
     # Assert num passed args = num expected, else return nonzero
     # Usage:
-    #     check_pos_args ${nargs} ${nspec}
+    #     check_pos_args ${nargs} ${nexact}|[${nmin} ${nmax}]
 
     if [[ "${FUNCNAME[1]}" != "${FUNCNAME[0]}" ]]; then
-        check_pos_args ${#} 2
+        check_pos_args ${#} 2 3
     fi
 
-    if [[ "${1}" != "${2}" ]]; then
-        logerror "Error: ${FUNCNAME[1]}: exactly ${2} positional arguments required,"\
+    if [ -n "${3-}" ]; then
+        if [[ "${1}" < "${2}" ]]; then
+            logerror "${FUNCNAME[1]}: at least ${2} positional arguments required,"\
+                     "${1} provided"
+            return 1
+        elif [[ "${1}" > "${3}" ]]; then
+            logerror "${FUNCNAME[1]}: at most ${3} positional arguments allowed,"\
+                     "${1} provided"
+            return 1
+        fi
+    elif [[ "${1}" != "${2}" ]]; then
+        logerror "${FUNCNAME[1]}: exactly ${2} positional arguments required,"\
                  "${1} provided"
         return 1
     fi
 }
-function logsuccess() { log "$(tput setaf 2)[SUCCESS]: ${*}$(tput sgr0)" ; }
-function loginfo()  { log "[INFO]: ${*}" ; }
-function logwarn()  { log "$(tput setaf 3)[WARN]: ${*}$(tput sgr0)" ; }
-function logerror() { log "$(tput setaf 1)[ERROR]: ${*}$(tput sgr0)" ; }
-function log () {
-    # local red green reset
-    # red=$(tput setaf 1); green=$(tput setaf 2); reset=$(tput sgr0)
 
+function log () {
     if [ -n "${debug-}" ]; then
         line_prefix=$(printf "${0}: %3d-%-10s --> " "${BASH_LINENO[0]}" "${FUNCNAME[1]}()")
     else
         line_prefix=""
     fi
-    printf "${line_prefix}${*}\n" >&2
+    echo "${line_prefix}${*}" >&2
 }
+
+function logsuccess () {
+    log "$(tput setaf 2)[SUCCESS]: ${*}$(tput sgr0)"
+}
+function loginfo () {
+    log "[INFO]: ${*}"
+}
+function logwarn () {
+    log "$(tput setaf 3)[WARN]: ${*}$(tput sgr0)"
+}
+function logerror () {
+    log "$(tput setaf 1)[ERROR]: ${*}$(tput sgr0)"
+}
+
+function logpipe () {
+    check_pos_args ${#} 1 3
+    local stdin severity
+    stdin="$(cat -)"; severity=${1}
+
+    if [ -z "${stdin}" ]; then
+        return
+    fi
+
+    if [ -n "${2-}" ]; then stdin="${2}${stdin}"; fi
+    if [ -n "${3-}" ]; then stdin="${stdin}${3}"; fi
+
+    if [[ "${severity}" == "success" ]]; then logsuccess "${stdin}"
+    elif [[ "${severity}" == "info" ]]; then loginfo "${stdin}"
+    elif [[ "${severity}" == "warn" ]]; then logwarn "${stdin}"
+    elif [[ "${severity}" == "error" ]]; then logerror "${stdin}"
+    else logerror "Invalid logpipe severity \"${severity}\", exiting"; exit 1
+    fi
+}
+
 
 function cleanup () {
     if [ -n "${loopback_dev-}" ]; then
-        loginfo "Unmounting disk image device ${loopback_dev}..."
+        loginfo "Unmounting disk image device ${loopback_dev}"
         sudo umount "${loopback_dev}" && sync
         sudo losetup -d "${loopback_dev}"
     fi
 
     if [ -d "${mount_dir-}" ]; then
-        loginfo "Removing mount dir ${mount_dir}..."
+        loginfo "Removing mount dir ${mount_dir}"
         rm -d "${mount_dir}"
     fi
 
     if [ -n "${docker_container-}" ]; then
-        loginfo "Removing temporary docker container..."
+        loginfo "Removing temporary docker container"
         docker container rm "${docker_container}"
     fi
 }
@@ -156,15 +194,20 @@ function init_disk_partitions () {
         exit 1
     fi
 
-    logwarn "this action will erase ALL DATA on ${file_details}"
+    logwarn "This action will erase ALL DATA on ${file_details}"
     if ! ask "Are you sure?" "N"; then
         logwarn "disk partitioning cancelled, exiting"
         exit 1
     fi
 
     loginfo "Writing partition table to disk image"
-    echo "label: dos" | sudo sfdisk "${filename}"
-    echo "start=2048, type=83, bootable" | sudo sfdisk "${filename}"
+
+    echo "label: dos" \
+        | sudo sfdisk -q "${filename}" 2>&1 \
+        | logpipe "warn" "sfdisk: "
+    echo "start=2048, type=83, bootable" \
+        | sudo sfdisk -q "${filename}" 2>&1 \
+        | logpipe "warn" "sfdisk: "
 }
 
 function init_system_hostname () {
@@ -216,26 +259,29 @@ function main () {
     loginfo "Loopback device configured, \"${loopback_dev}\""
 
     loginfo "Formatting disk partition as ext4"
-    sudo mkfs.ext4 -q "${loopback_dev}"
+    sudo mkfs.ext4 -q "${loopback_dev}" | logpipe "warn" "mkfs.ext4: "
 
     init_disk_mount "${loopback_dev}" "${mount_dir}"
 
-    loginfo "Copying filesystem from docker image to disk image..."
+    loginfo "Copying filesystem from docker image to disk image"
     docker_container=$(docker run -d "${image_name}" /bin/true)
     docker export "${docker_container}" \
         | pv -ptebars "$(docker image inspect "${image_name}" | jq '.[0].Size')" \
-        | sudo tar -xf - -X exclude.txt -C "${mount_dir}"
+        | sudo tar -xf - --exclude="{tmp,sys,proc}" -C "${mount_dir}"
 
-    loginfo "Writing system hostname \"${system_hostname}\" to disk image..."
+    loginfo "Writing system hostname \"${system_hostname}\" to disk image"
     init_system_hostname "${system_hostname}" "${mount_dir}"
 
-    loginfo "Installing extlinux bootloader on disk image..."
-    sudo extlinux --install "${mount_dir}"/boot
+    loginfo "Installing extlinux bootloader on disk image"
+    sudo extlinux --install "${mount_dir}"/boot 2>&1 \
+        | logpipe "warn" "extlinux: "
 
-    loginfo "Writing syslinux mbr to disk image..."
-    sudo dd if=/usr/lib/syslinux/mbr/mbr.bin of="${file_name}" bs=440 count=1 conv=notrunc status=none
+    loginfo "Writing syslinux mbr to disk image"
+    sudo dd if=/usr/lib/syslinux/mbr/mbr.bin of="${file_name}" \
+            bs=440 count=1 conv=notrunc status=none 2>&1 \
+        | logpipe "warn" "syslinux dd: "
 
-    logsuccess "disk image creation complete..."
+    logsuccess "disk image creation complete"
 
 }
 
