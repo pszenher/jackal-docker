@@ -85,7 +85,7 @@
 *** TODO ROS 2
     - Consider producing Jackal configuration for ROS 2
 
-* TODO Image Export Script(s) [5/6]
+* TODO Image Export Script(s) [5/7]
 
 ** +Remove calls as root user+
    - +should not need to use kernel drivers to mount loopback devices and init an ext4 fs+
@@ -113,3 +113,7 @@
 ** DONE Reduce unformatted writes to stderr
    - utilities run within the script should have output suppressed when ~debug~ flag is not passed
    - can also format output using ~log~ function if structure is amenable to that
+** TODO Implement update function
+   - should be able to update an existing image from the same docker image
+   - would use a utility like ~rsync~ to copy the filesystem more quickly by preserving unchanged files
+   - should be enabled via use of a command line flag
