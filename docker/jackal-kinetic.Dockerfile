@@ -125,7 +125,7 @@ RUN source /etc/ros/setup.bash && \
 # ====================================================================
 
 # Add $JACKAL_USER user with group memberships and hashed password
-RUN useradd -mUG sudo "${JACKAL_USER}" && \
+RUN useradd -mUG wheel "${JACKAL_USER}" && \
     echo "${JACKAL_USER}:${JACKAL_PASSWORD}" \
     | chpasswd -e
 
