@@ -21,6 +21,7 @@ function usage () {
     # Usage:
     #     usage
     # Reference: https://samizdat.dev/help-message-for-shell-scripts/
+
     sed -rn 's/^### ?/ /;T;p' "${0}"
 }
 
@@ -29,6 +30,7 @@ function ask () {
     # Usage:
     #     ask ${prompt} ${Y|N}
     # Reference: https://gist.github.com/davejamesmiller/1965569
+
     local prompt default reply
     if [[ ${2:-} = 'Y' ]]; then
         prompt='Y/n'
@@ -61,6 +63,7 @@ function check_pos_args () {
     # Assert num passed args = num expected, else return nonzero
     # Usage:
     #     check_pos_args ${nargs} ${nexact}|[${nmin} ${nmax}]
+
     if [[ "${FUNCNAME[1]}" != "${FUNCNAME[0]}" ]]; then
         check_pos_args ${#} 2 3
     fi
@@ -83,6 +86,10 @@ function check_pos_args () {
 }
 
 function log () {
+    # Log data to console with set format (cannot be invoked directly)
+    # Usage:
+    #     log ${string}
+
     if [[ "${FUNCNAME[1]}" != log* ]]; then
         logerror "log() function illegally invoked by ${FUNCNAME[1]}, use wrapper function" \
                  "(loginfo, etc.) instead"
@@ -96,20 +103,16 @@ function log () {
     echo "${line_prefix}${*}" >&2
 }
 
-function logsuccess () {
-    log "$(tput setaf 2)[SUCCESS]: ${*}$(tput sgr0)"
-}
-function loginfo () {
-    log "[INFO]: ${*}"
-}
-function logwarn () {
-    log "$(tput setaf 3)[WARN]: ${*}$(tput sgr0)"
-}
-function logerror () {
-    log "$(tput setaf 1)[ERROR]: ${*}$(tput sgr0)"
-}
+function logsuccess () { log "$(tput setaf 2)[SUCCESS]: ${*}$(tput sgr0)" ; }
+function loginfo    () { log "[INFO]: ${*}"                               ; }
+function logwarn    () { log "$(tput setaf 3)[WARN]: ${*}$(tput sgr0)"    ; }
+function logerror   () { log "$(tput setaf 1)[ERROR]: ${*}$(tput sgr0)"   ; }
 
 function logpipe () {
+    # Send stdin data to log functions
+    # Usage:
+    #     echo "data to log..." | logpipe ${severity} [${prefix} ${suffix}]
+
     check_pos_args ${#} 1 3
     local stdin severity
     stdin="$(cat -)"; severity=${1}
@@ -131,17 +134,24 @@ function logpipe () {
 
 
 function cleanup () {
+    # Cleanup function to run on exit
+    # Usage:
+    #     cleanup
+
+    # Unmount and delete loopback device if it is defined
     if [ -n "${loopback_dev-}" ]; then
         loginfo "Unmounting disk image device ${loopback_dev}"
         sudo umount "${loopback_dev}" && sync
         sudo losetup -d "${loopback_dev}"
     fi
 
-    if [ -d "${mount_dir-}" ]; then
+    # Remove mount dir if it was created by this script
+    if [ -d "${mount_dir-}" ] && [ -z "${mount_dir_existed-}" ] ; then
         loginfo "Removing mount dir ${mount_dir}"
         rm -d "${mount_dir}"
     fi
 
+    # Remove temporary docker container if it is defined
     if [ -n "${docker_container-}" ]; then
         loginfo "Removing temporary docker container"
         docker container rm "${docker_container}" > /dev/null
@@ -149,6 +159,9 @@ function cleanup () {
 }
 
 function catch () {
+    # Handler function for trapping process signals
+    # Usage:
+    #     trap "catch" EXIT
     exit_code=${?}
     cleanup
     exit ${exit_code}
@@ -158,8 +171,8 @@ function init_disk_image () {
     # Initialize ${filename} disk image
     # Usage:
     #     init_disk_image ${filename} ${filesize}
-    check_pos_args ${#} 2
 
+    check_pos_args ${#} 2
     local filename filesize
     filename=${1};filesize=${2}
 
@@ -175,8 +188,8 @@ function init_disk_partitions () {
     # Initialize ${filename} disk partitions
     # Usage:
     #     init_disk_partition ${filename}
-    check_pos_args ${#} 1
 
+    check_pos_args ${#} 1
     local filename disk_model file_details
     filename=${1}
 
@@ -217,8 +230,8 @@ function init_system_hostname () {
     # Set hostname ${hostname} of filesystem at ${rootdir}
     # Usage:
     #     init_system_hostname ${hostname} ${rootdir}
-    check_pos_args ${#} 2
 
+    check_pos_args ${#} 2
     local hostname rootdir
     hostname=${1}; rootdir=${2}
 
@@ -233,8 +246,8 @@ function init_disk_mount () {
     # Initialize ${partition} disk mount location and mount
     # Usage:
     #     init_disk_mount ${partition} ${mountdir}
-    check_pos_args ${#} 2
 
+    check_pos_args ${#} 2
     local partition mountdir;
     partition=${1}; mountdir=${2}
 
@@ -351,6 +364,10 @@ if [[ ${#} -ne 2 ]]; then
     exit 1
 fi
 image_name=${1}; file_name=${2}
+
+if [ -e "${mount_dir}" ]; then
+    mount_dir_existed=y
+fi
 
 # Invoke main function
 main
