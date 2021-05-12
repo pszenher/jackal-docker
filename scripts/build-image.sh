@@ -16,7 +16,7 @@
 ###   --size,     -s SIZE      Size of disk image (see man truncate(1) for SIZE arg semantics)
 ###
 
-function usage () {
+function usage() {
     # Use file header as usage guide
     # Usage:
     #     usage
@@ -25,7 +25,7 @@ function usage () {
     sed -rn 's/^### ?/ /;T;p' "${0}"
 }
 
-function ask () {
+function ask() {
     # General-purpose y-or-n function
     # Usage:
     #     ask ${prompt} ${Y|N}
@@ -53,13 +53,13 @@ function ask () {
         fi
         # Check if the reply is valid
         case "${reply}" in
-            Y*|y*) return 0 ;;
-            N*|n*) return 1 ;;
+            Y* | y*) return 0 ;;
+            N* | n*) return 1 ;;
         esac
     done
 }
 
-function check_pos_args () {
+function check_pos_args() {
     # Assert num passed args = num expected, else return nonzero
     # Usage:
     #     check_pos_args ${nargs} ${nexact}|[${nmin} ${nmax}]
@@ -70,29 +70,29 @@ function check_pos_args () {
 
     if [ -n "${3-}" ]; then
         if [[ "${1}" < "${2}" ]]; then
-            logerror "${FUNCNAME[1]}: at least ${2} positional arguments required,"\
-                     "${1} provided"
+            logerror "${FUNCNAME[1]}: at least ${2} positional arguments required," \
+                "${1} provided"
             return 1
         elif [[ "${1}" > "${3}" ]]; then
-            logerror "${FUNCNAME[1]}: at most ${3} positional arguments allowed,"\
-                     "${1} provided"
+            logerror "${FUNCNAME[1]}: at most ${3} positional arguments allowed," \
+                "${1} provided"
             return 1
         fi
     elif [[ "${1}" != "${2}" ]]; then
-        logerror "${FUNCNAME[1]}: exactly ${2} positional arguments required,"\
-                 "${1} provided"
+        logerror "${FUNCNAME[1]}: exactly ${2} positional arguments required," \
+            "${1} provided"
         return 1
     fi
 }
 
-function log () {
+function log() {
     # Log data to console with set format (cannot be invoked directly)
     # Usage:
     #     log ${string}
 
     if [[ "${FUNCNAME[1]}" != log* ]]; then
         logerror "log() function illegally invoked by ${FUNCNAME[1]}, use wrapper function" \
-                 "(loginfo, etc.) instead"
+            "(loginfo, etc.) instead"
         return 1
     fi
     if [ -n "${debug-}" ]; then
@@ -103,19 +103,20 @@ function log () {
     echo "${line_prefix}${*}" >&2
 }
 
-function logsuccess () { log "$(tput setaf 2)[SUCCESS]: ${*}$(tput sgr0)" ; }
-function loginfo    () { log "[INFO]: ${*}"                               ; }
-function logwarn    () { log "$(tput setaf 3)[WARN]: ${*}$(tput sgr0)"    ; }
-function logerror   () { log "$(tput setaf 1)[ERROR]: ${*}$(tput sgr0)"   ; }
+function logsuccess() { log "$(tput setaf 2)[SUCCESS]: ${*}$(tput sgr0)"; }
+function loginfo() { log "[INFO]: ${*}"; }
+function logwarn() { log "$(tput setaf 3)[WARN]: ${*}$(tput sgr0)"; }
+function logerror() { log "$(tput setaf 1)[ERROR]: ${*}$(tput sgr0)"; }
 
-function logpipe () {
+function logpipe() {
     # Send stdin data to log functions
     # Usage:
     #     echo "data to log..." | logpipe ${severity} [${prefix} ${suffix}]
 
     check_pos_args ${#} 1 3
     local stdin severity
-    stdin="$(cat -)"; severity=${1}
+    stdin="$(cat -)"
+    severity=${1}
 
     if [ -z "${stdin}" ]; then
         return
@@ -124,16 +125,21 @@ function logpipe () {
     if [ -n "${2-}" ]; then stdin="${2}${stdin}"; fi
     if [ -n "${3-}" ]; then stdin="${stdin}${3}"; fi
 
-    if [[ "${severity}" == "success" ]]; then logsuccess "${stdin}"
-    elif [[ "${severity}" == "info" ]]; then loginfo "${stdin}"
-    elif [[ "${severity}" == "warn" ]]; then logwarn "${stdin}"
-    elif [[ "${severity}" == "error" ]]; then logerror "${stdin}"
-    else logerror "Invalid logpipe severity \"${severity}\", exiting"; return 1
+    if [[ "${severity}" == "success" ]]; then
+        logsuccess "${stdin}"
+    elif [[ "${severity}" == "info" ]]; then
+        loginfo "${stdin}"
+    elif [[ "${severity}" == "warn" ]]; then
+        logwarn "${stdin}"
+    elif [[ "${severity}" == "error" ]]; then
+        logerror "${stdin}"
+    else
+        logerror "Invalid logpipe severity \"${severity}\", exiting"
+        return 1
     fi
 }
 
-
-function cleanup () {
+function cleanup() {
     # Cleanup function to run on exit
     # Usage:
     #     cleanup
@@ -146,7 +152,7 @@ function cleanup () {
     fi
 
     # Remove mount dir if it was created by this script
-    if [ -d "${mount_dir-}" ] && [ -z "${mount_dir_existed-}" ] ; then
+    if [ -d "${mount_dir-}" ] && [ -z "${mount_dir_existed-}" ]; then
         loginfo "Removing mount dir ${mount_dir}"
         rm -d "${mount_dir}"
     fi
@@ -154,11 +160,11 @@ function cleanup () {
     # Remove temporary docker container if it is defined
     if [ -n "${docker_container-}" ]; then
         loginfo "Removing temporary docker container"
-        docker container rm "${docker_container}" > /dev/null
+        docker container rm "${docker_container}" >/dev/null
     fi
 }
 
-function catch () {
+function catch() {
     # Handler function for trapping process signals
     # Usage:
     #     trap "catch" EXIT
@@ -168,14 +174,15 @@ function catch () {
     exit ${exit_code}
 }
 
-function init_disk_image () {
+function init_disk_image() {
     # Initialize ${filename} disk image
     # Usage:
     #     init_disk_image ${filename} ${filesize}
 
     check_pos_args ${#} 2
     local filename filesize
-    filename=${1};filesize=${2}
+    filename=${1}
+    filesize=${2}
 
     # If target image filename doesn't exist, create the file
     if [ ! -e "${filename}" ]; then
@@ -185,7 +192,7 @@ function init_disk_image () {
 
 }
 
-function init_disk_partitions () {
+function init_disk_partitions() {
     # Initialize ${filename} disk partitions
     # Usage:
     #     init_disk_partition ${filename}
@@ -227,30 +234,32 @@ function init_disk_partitions () {
         | logpipe "warn" "sfdisk: "
 }
 
-function init_system_hostname () {
+function init_system_hostname() {
     # Set hostname ${hostname} of filesystem at ${rootdir}
     # Usage:
     #     init_system_hostname ${hostname} ${rootdir}
 
     check_pos_args ${#} 2
     local hostname rootdir
-    hostname=${1}; rootdir=${2}
+    hostname=${1}
+    rootdir=${2}
 
-    echo "${hostname}" | sudo tee "${rootdir}/etc/hostname" > /dev/null
-    cat << EOF | sudo tee "${rootdir}/etc/hosts" > /dev/null
+    echo "${hostname}" | sudo tee "${rootdir}/etc/hostname" >/dev/null
+    cat <<EOF | sudo tee "${rootdir}/etc/hosts" >/dev/null
 127.0.0.1	localhost
 127.0.1.1	${hostname}
 EOF
 }
 
-function init_disk_mount () {
+function init_disk_mount() {
     # Initialize ${partition} disk mount location and mount
     # Usage:
     #     init_disk_mount ${partition} ${mountdir}
 
     check_pos_args ${#} 2
-    local partition mountdir;
-    partition=${1}; mountdir=${2}
+    local partition mountdir
+    partition=${1}
+    mountdir=${2}
 
     if [ ! -e "${mountdir}" ]; then
         mkdir -p "${mountdir}"
@@ -263,7 +272,7 @@ function init_disk_mount () {
     sudo mount -t ext4 "${partition}" "${mountdir}"
 }
 
-function main () {
+function main() {
     loginfo "Initializing disk image"
     init_disk_image "${file_name}" "${image_file_size}"
 
@@ -294,7 +303,7 @@ function main () {
 
     loginfo "Writing syslinux mbr to disk image"
     sudo dd if=/usr/lib/syslinux/mbr/mbr.bin of="${file_name}" \
-            bs=440 count=1 conv=notrunc status=none 2>&1 \
+        bs=440 count=1 conv=notrunc status=none 2>&1 \
         | logpipe "warn" "syslinux dd: "
 
     logsuccess "disk image creation complete"
@@ -306,7 +315,7 @@ set -o errexit -o pipefail -o noclobber -o nounset
 trap "catch" EXIT
 
 # Check if system getopt is GNU enhanced version
-if getopt --test > /dev/null; then
+if getopt --test >/dev/null; then
     logerror "\"getopt --test\" failed, this script requires GNU enhanced getopt"
     logerror "Cannot parse args, exiting"
     exit 1
@@ -317,8 +326,7 @@ OPTIONS=hH:s:
 LONGOPTS=help,debug,hostname:,size:
 
 # Parse arguments with getopt
-PARSED=$(getopt --options=${OPTIONS} --longoptions=${LONGOPTS} \
-                --name "${0}" -- "${@}")
+PARSED=$(getopt --options=${OPTIONS} --longoptions=${LONGOPTS} --name "${0}" -- "${@}")
 
 # Set positional arguments to getopt output
 eval set -- "${PARSED}"
@@ -331,7 +339,7 @@ image_file_size="5G"
 # Handle named arguments
 while true; do
     case "${1}" in
-        -h|--help)
+        -h | --help)
             usage
             exit 1
             ;;
@@ -339,11 +347,11 @@ while true; do
             debug=y
             shift
             ;;
-        -H|--hostname)
+        -H | --hostname)
             system_hostname="${2}"
             shift 2
             ;;
-        -s|--size)
+        -s | --size)
             image_file_size="${2}"
             shift 2
             ;;
@@ -364,7 +372,8 @@ if [[ ${#} -ne 2 ]]; then
     usage
     exit 1
 fi
-image_name=${1}; file_name=${2}
+image_name=${1}
+file_name=${2}
 
 if [ -e "${mount_dir}" ]; then
     mount_dir_existed=y
