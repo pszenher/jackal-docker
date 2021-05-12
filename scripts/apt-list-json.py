@@ -29,16 +29,15 @@ class UpgradableOrNotInstalledFilter(apt.cache.Filter):
 
 
 def apt_filter(filter_name: str):
-    if args.filter is None:
+    if filter_name == "all":
         return CandidateFilter()
-    elif args.filter == "installed":
+    if filter_name == "installed":
         return InstalledFilter()
-    elif args.filter == "upgradable":
+    if filter_name == "upgradable":
         return UpgradableFilter()
-    elif args.filter == "new":
+    if filter_name == "new":
         return UpgradableOrNotInstalledFilter()
-    else:
-        raise ValueError(f'Filter name "{filter_name}" is not a valid filter.')
+    raise ValueError('Filter name "{}" is not a valid filter.'.format(filter_name))
 
 
 def main(args: argparse.Namespace) -> None:
@@ -48,7 +47,7 @@ def main(args: argparse.Namespace) -> None:
     full_cache.open()
 
     filter_cache = apt.cache.FilteredCache(full_cache)
-    filter_cache.set_filter(args.apt_filter)
+    filter_cache.set_filter(args.filter)
 
     package_dict = {pack.shortname: pack.candidate.version for pack in filter_cache}
 
@@ -60,8 +59,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f",
         "--filter",
+        default="all",
         type=apt_filter,
-        metavar="[installed|upgradable|new]",
+        metavar="[all|installed|upgradable|new]",
         help="Filter to apply to apt package list.",
     )
     args = parser.parse_args()

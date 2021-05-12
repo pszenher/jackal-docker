@@ -1,3 +1,5 @@
+# shellcheck shell=bash disable=SC1090
+
 # Mark location of self so that robot_upstart knows where to find the setup file.
 export ROBOT_SETUP=/etc/ros/setup.bash
 
@@ -9,4 +11,4 @@ export ROBOT_SETUP=/etc/ros/setup.bash
 ######
 
 # Pass through to the main ROS workspace of the system.
-source /opt/ros/$ROS_DISTRO/setup.bash
+source "/opt/ros/$ROS_DISTRO/setup.bash"

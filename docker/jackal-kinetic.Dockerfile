@@ -64,18 +64,18 @@ RUN DEBIAN_FRONTEND=noninteractive \
     python-rosinstall=0.7.8-1 \
     python-rosinstall-generator=0.1.22-1 \
     python-wstool=0.1.17-1 \
-    ros-kinetic-robot=1.3.2-0xenial-20201103-233358+0000 \
-    ros-kinetic-ros-base=1.3.2-0xenial-20201103-121012+0000 \
+    ros-kinetic-robot=1.3.2-0xenial-20210503-155848-0800 \
+    ros-kinetic-ros-base=1.3.2-0xenial-20210503-151705-0800 \
     \
     # Jackal Clearpath Packages
     python-ds4drv=0.5.2xenial \
     ros-kinetic-jackal-robot=0.5.1-1xenial-20210310-162855-0500 \
     \
     # Dependencies: la3dm
-    ros-kinetic-octomap-mapping \
+    ros-kinetic-octomap-mapping=0.6.4-2xenial-20210503-171237-0800 \
     \
     # Dependencies: spin_hokuyo
-    ros-kinetic-laser-geometry \
+    ros-kinetic-laser-geometry=1.6.7-1xenial-20210503-142502-0800 \
     \
     && rm -rf /var/lib/apt/lists/*
 
@@ -125,7 +125,7 @@ RUN source /etc/ros/setup.bash && \
 # ====================================================================
 
 # Add $JACKAL_USER user with group memberships and hashed password
-RUN useradd -mUG sudo "${JACKAL_USER}" && \
+RUN useradd -mUG "sudo" "${JACKAL_USER}" && \
     echo "${JACKAL_USER}:${JACKAL_PASSWORD}" \
     | chpasswd -e
 
