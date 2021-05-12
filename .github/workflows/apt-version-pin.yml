@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Docker Python3 Library
-      run: |
-        sudo apt-get update
-        sudo apt-get install python3-docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-docker
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
