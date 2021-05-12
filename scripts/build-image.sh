@@ -61,7 +61,6 @@ function check_pos_args () {
     # Assert num passed args = num expected, else return nonzero
     # Usage:
     #     check_pos_args ${nargs} ${nexact}|[${nmin} ${nmax}]
-
     if [[ "${FUNCNAME[1]}" != "${FUNCNAME[0]}" ]]; then
         check_pos_args ${#} 2 3
     fi
@@ -84,8 +83,13 @@ function check_pos_args () {
 }
 
 function log () {
+    if [[ "${FUNCNAME[1]}" != log* ]]; then
+        logerror "log() function illegally invoked by ${FUNCNAME[1]}, use wrapper function" \
+                 "(loginfo, etc.) instead"
+        return 1
+    fi
     if [ -n "${debug-}" ]; then
-        line_prefix=$(printf "${0}: %3d-%-10s --> " "${BASH_LINENO[0]}" "${FUNCNAME[1]}()")
+        line_prefix=$(printf "${0}: %3d:%-23s --> " "${BASH_LINENO[1]}" "${FUNCNAME[2]}()")
     else
         line_prefix=""
     fi
@@ -121,7 +125,7 @@ function logpipe () {
     elif [[ "${severity}" == "info" ]]; then loginfo "${stdin}"
     elif [[ "${severity}" == "warn" ]]; then logwarn "${stdin}"
     elif [[ "${severity}" == "error" ]]; then logerror "${stdin}"
-    else logerror "Invalid logpipe severity \"${severity}\", exiting"; exit 1
+    else logerror "Invalid logpipe severity \"${severity}\", exiting"; return 1
     fi
 }
 
@@ -140,7 +144,7 @@ function cleanup () {
 
     if [ -n "${docker_container-}" ]; then
         loginfo "Removing temporary docker container"
-        docker container rm "${docker_container}"
+        docker container rm "${docker_container}" > /dev/null
     fi
 }
 
@@ -171,15 +175,14 @@ function init_disk_partitions () {
     # Initialize ${filename} disk partitions
     # Usage:
     #     init_disk_partition ${filename}
-
-    local filename disk_model file_details
     check_pos_args ${#} 1
 
+    local filename disk_model file_details
     filename=${1}
 
     if [ -z "${filename-}" ]; then
         logerror "No image filename provided"
-        exit 1
+        return 1
     fi
 
     if [ -b "${filename}" ]; then
@@ -191,13 +194,13 @@ function init_disk_partitions () {
         file_details="image file ${filename}"
     else
         logerror "Image file is neither a block device nor a regular file"
-        exit 1
+        return 1
     fi
 
     logwarn "This action will erase ALL DATA on ${file_details}"
     if ! ask "Are you sure?" "N"; then
         logwarn "disk partitioning cancelled, exiting"
-        exit 1
+        return 1
     fi
 
     loginfo "Writing partition table to disk image"
@@ -230,7 +233,6 @@ function init_disk_mount () {
     # Initialize ${partition} disk mount location and mount
     # Usage:
     #     init_disk_mount ${partition} ${mountdir}
-
     check_pos_args ${#} 2
 
     local partition mountdir;
@@ -240,7 +242,7 @@ function init_disk_mount () {
         mkdir -p "${mountdir}"
     elif [ ! -d "${mountdir}" ]; then
         logerror "Target mount dir ${mountdir} is not a directory"
-        exit 1
+        return 1
     fi
 
     loginfo "Mounting formatted disk partition at ${mountdir}"
@@ -285,35 +287,26 @@ function main () {
 
 }
 
-# Exit on error
+# Set sane bash options and catch EXIT signal
 set -o errexit -o pipefail -o noclobber -o nounset
 trap "catch" EXIT
 
-# Parsing code reference: https://stackoverflow.com/q/192249#29754866
-# -allow a command to fail with !’s side effect on errexit
-# -use return value from ${PIPESTATUS[0]}, because ! hosed $?
-# shellcheck disable=SC2251
-! getopt --test > /dev/null
-if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
-    logerror "'getopt --test' failed, cannot parse arguments"
+# Check if system getopt is GNU enhanced version
+if getopt --test > /dev/null; then
+    logerror "\"getopt --test\" failed, this script requires GNU enhanced getopt"
+    logerror "Cannot parse args, exiting"
     exit 1
 fi
 
+# Set getopt command-line options
 OPTIONS=hH:s:
 LONGOPTS=help,debug,hostname:,size:
 
-# -regarding ! and PIPESTATUS see above
-# -temporarily store output to be able to check for errors
-# -activate quoting/enhanced mode (e.g. by writing out “--options”)
-# -pass arguments only via   -- "$@"   to separate them correctly
-# shellcheck disable=SC2251
-! PARSED=$(getopt --options=${OPTIONS} --longoptions=${LONGOPTS} --name "${0}" -- "${@}")
-if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
-    # getopt has printed argument parsing error to stdout, exit
-    exit 1
-fi
+# Parse arguments with getopt
+PARSED=$(getopt --options=${OPTIONS} --longoptions=${LONGOPTS} \
+                --name "${0}" -- "${@}")
 
-# -read getopt’s output this way to handle the quoting right:
+# Set positional arguments to getopt output
 eval set -- "${PARSED}"
 
 # Set variable defaults
@@ -321,6 +314,7 @@ system_hostname="jackal"
 mount_dir="tmp_mnt"
 image_file_size="5G"
 
+# Handle named arguments
 while true; do
     case "${1}" in
         -h|--help)
@@ -350,12 +344,13 @@ while true; do
     esac
 done
 
-# Handle positional argument
+# Handle positional arguments
 if [[ ${#} -ne 2 ]]; then
-    logerror "exactly 2 positional arguments required, ${#} provided"
+    logerror "${0}: exactly 2 positional arguments required, ${#} provided"
     usage
     exit 1
 fi
-
 image_name=${1}; file_name=${2}
+
+# Invoke main function
 main
