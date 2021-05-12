@@ -147,7 +147,7 @@ def main() -> None:
     try:
         stdout = docker_client.containers.run(
             image="jackal-kinetic",
-            command="python3 /apt-list-json.py",
+            command="python3 /apt-list-json.py -f new",
             user="root",
             volumes={
                 sys.path[0]
@@ -164,7 +164,6 @@ def main() -> None:
             f'Command "{e.command}" in image "{e.image}" returned non-zero exit status {e.exit_status}:',
         )
         logging.error(e.stderr.decode())
-        logging.error("Removing exited container")
         sys.exit(1)
 
     upgradable = json.loads(stdout)
