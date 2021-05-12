@@ -12,9 +12,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-        repository: ${{ github.repository }}
-        ref: "master"
-        path: 'repo'
+          repository: ${{ github.repository }}
+          ref: "master"
+          path: 'repo'
       - name: Run Dependency Parser
         run: python3 repo/scripts/dep-parser.py
       - name: Create Pull Request
