@@ -7,6 +7,7 @@ import re
 import shlex
 import sys
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Dict, Iterable, Union
 
 import docker  # type: ignore
@@ -131,28 +132,40 @@ class AptDockerfileParser(DockerfileParser):
 
 
 def main() -> None:
+    dockerfile_path = Path("../docker/jackal-kinetic.Dockerfile").as_posix()
+
     # Parse target dockerfile
-    logging.warning("Parsing dockerfile...")
-    dfp = AptDockerfileParser()
-    with open("jackal-kinetic.Dockerfile", "r") as f:
+    logging.getLogger().setLevel(logging.INFO)
+    logging.info("Parsing dockerfile...")
+    dfp = AptDockerfileParser(dockerfile_path)
+    with open(dockerfile_path, "r") as f:
         dfp.content = f.read()
 
     packages = dfp.apt_packages
 
     docker_client = docker.from_env()
-    stdout = docker_client.containers.run(
-        image="jackal-kinetic",
-        command="python3 /apt-list-json.py",
-        user="root",
-        volumes={
-            sys.path[0]
-            + "/apt-list-json.py": {"bind": "/apt-list-json.py", "mode": "ro"}
-        },
-        auto_remove=True,
-        read_only=False,
-        detach=False,
-        stdout=True,
-    )
+    try:
+        stdout = docker_client.containers.run(
+            image="jackal-kinetic",
+            command="python3 /apt-list-json.py",
+            user="root",
+            volumes={
+                sys.path[0]
+                + "/apt-list-json.py": {"bind": "/apt-list-json.py", "mode": "ro"}
+            },
+            remove=True,
+            read_only=False,
+            detach=False,
+            stdout=True,
+        )
+
+    except docker.errors.ContainerError as e:
+        logging.error(
+            f'Command "{e.command}" in image "{e.image}" returned non-zero exit status {e.exit_status}:',
+        )
+        logging.error(e.stderr.decode())
+        logging.error("Removing exited container")
+        sys.exit(1)
 
     upgradable = json.loads(stdout)
 
@@ -163,13 +176,12 @@ def main() -> None:
             # Ignore upgradable packages that are not listed in the dockerfile
             pass
 
-    filename = "jackal-kinetic.Dockerfile"
     # Read current dockerfile as list of lines
-    with open(filename, "r") as dockerfile:
+    with open(dockerfile_path, "r") as dockerfile:
         dockerfile_lines = dockerfile.readlines()
 
     # Overwrite dockerfile with substituted package versions
-    with open(filename, "w") as dockerfile:
+    with open(dockerfile_path, "w") as dockerfile:
         for lnum, line in enumerate(dockerfile_lines):
             if any(map(lambda r: r[0] <= lnum <= r[1], dfp.apt_lines)):
                 for p in filter(
