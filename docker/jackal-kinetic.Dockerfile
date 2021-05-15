@@ -28,7 +28,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install --no-install-recommends -y \
     \
     # System packages
-    build-essential=* \
+    build-essential=12.1ubuntu2 \
     ca-certificates=20210119~16.04.1 \
     curl=7.47.0-1ubuntu2.19 \
     dhcpcd5=6.10.1-1 \
