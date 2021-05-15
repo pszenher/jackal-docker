@@ -17,8 +17,8 @@ jobs:
         with:
           fetch-depth: 0
           repository: ${{ github.repository }}
-          ref: "master"
-          path: "repo"
+          ref: master
+          path: repo
       - name: Install Python requirements.txt
         run: pip install -r repo/requirements.txt
       - name: Run Dependency Parser
@@ -30,3 +30,4 @@ jobs:
           body: Update Dockerfile apt version pins to latest version available
           commit-message: update jackal-kinetic.Dockerfile pinned apt versions
           branch: update-apt
+          path: repo
