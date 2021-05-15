@@ -1,4 +1,11 @@
 FROM ubuntu:xenial-20210416
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial main universe multiverse restricted"
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial-security main universe multiverse restricted"
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial-updates main universe multiverse restricted"
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial-backports main universe multiverse restricted"
+# apt-pin: repo="deb https://mirrors.osuosl.org/pub/ros/packages.ros.org/ros/ubuntu xenial main"
+# apt-pin: repo="deb https://packages.clearpathrobotics.com/stable/ubuntu xenial main"
+
 
 ENV ROS_DISTRO=kinetic
 

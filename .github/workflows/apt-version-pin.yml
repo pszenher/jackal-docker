@@ -2,25 +2,27 @@ name: Apt Pin Versions
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * MON'
+    - cron: "0 8 * * MON"
 jobs:
   update-versions:
     name: Update Apt Versions
     runs-on: ubuntu-latest
     steps:
-      - name: Install Docker Python3 Library
-        run: |
-          sudo apt-get update
-          sudo apt-get install python3-docker
+      # - name: Install Docker Python3 Library
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install python3-docker
+      - name: Install Python requirements.txt
+        run: pip install -r repo/requirements.txt
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           repository: ${{ github.repository }}
           ref: "master"
-          path: 'repo'
+          path: "repo"
       - name: Run Dependency Parser
-        run: python3 repo/scripts/dep-parser.py
+        run: python3 repo/scripts/dep-parser.py -f repo/docker/jackal-kinetic.Dockerfile -w
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3.9.1
         with:
