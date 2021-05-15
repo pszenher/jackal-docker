@@ -8,7 +8,6 @@ import difflib
 import functools
 import json
 import logging
-import os
 import pickle
 import re
 import shlex
@@ -122,7 +121,8 @@ class PinnedPackageList:
 
     def __getitem__(self, key: str) -> PinnedPackage:
         if key not in self.packages:
-            raise ValueError(f'Package name "{key}" is not in the package list.')
+            raise ValueError(
+                f'Package name "{key}" is not in the package list.')
         return self.packages[key]
 
     @property
@@ -208,7 +208,7 @@ class AptDockerfileParser(DockerfileParser):
                 if key != "repo":
                     raise ValueError(
                         f'Unexpected apt-pin parameter key "{key}"'
-                        + f'with value "{value}" on line {content["startline"]}'
+                        + f'with value "{value}" on line {command["startline"]}'
                     )
 
                 repos.append(value)
@@ -221,7 +221,8 @@ class AptDockerfileParser(DockerfileParser):
 
         pkg_list = []
         for command in filter(lambda cmd: cmd["instruction"] == "RUN", self.structure):
-            tokens = shlex.shlex(command["content"], posix=True, punctuation_chars=True)
+            tokens = shlex.shlex(
+                command["content"], posix=True, punctuation_chars=True)
             tokens.whitespace_split = True
             tokens_linum = []
             tokens.lineno -= 1
@@ -229,7 +230,8 @@ class AptDockerfileParser(DockerfileParser):
                 # TODO: fix in case of multiple consecutive comment lines (parsed as multiple commands)
                 tokens.lineno += sum(
                     (
-                        c["endline"] + 1 - (command["startline"] + tokens.lineno)
+                        c["endline"] + 1 -
+                        (command["startline"] + tokens.lineno)
                         for c in self.structure
                         if c["instruction"] == "COMMENT"
                         and command["startline"] + tokens.lineno
@@ -329,7 +331,8 @@ def check_cache_validity(
         return False
 
     if force_refresh:
-        logging.warning("Apt cache refresh requested, redownloading apt repo packages")
+        logging.warning(
+            "Apt cache refresh requested, redownloading apt repo packages")
         return False
 
     cache_mtime = datetime.fromtimestamp(cache_path.stat().st_mtime)
@@ -378,7 +381,8 @@ def main(args: argparse.Namespace) -> None:
                     err,
                 )
                 sys.exit(1)
-            package_fetch_time = datetime.fromtimestamp(cache_path.stat().st_mtime)
+            package_fetch_time = datetime.fromtimestamp(
+                cache_path.stat().st_mtime)
         else:
             package_fetch_time = datetime.now()
             all_packages = sources.packages
