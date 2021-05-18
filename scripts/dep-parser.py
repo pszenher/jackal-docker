@@ -119,6 +119,9 @@ class PinnedPackageList:
     def __iter__(self):
         yield from self.packages.values()
 
+    def __len__(self):
+        return len(self.packages.keys())
+
     def __getitem__(self, key: str) -> PinnedPackage:
         if key not in self.packages:
             raise ValueError(f'Package name "{key}" is not in the package list.')
@@ -343,7 +346,6 @@ def check_cache_validity(
 
 def main(args: argparse.Namespace) -> None:
     # Parse target dockerfile
-    logging.info("Parsing dockerfile %s", args.file)
     dfp = AptDockerfileParser(args.file.as_posix())
 
     if args.sources_list is not None:
@@ -397,6 +399,13 @@ def main(args: argparse.Namespace) -> None:
     for package in repo_packages:
         docker_packages.update_package(package.package, package.version)
 
+    logging.info(
+        'Found %d apt packages in Dockerfile "%s", %d upgradable',
+        len(docker_packages),
+        args.file.as_posix(),
+        len([p for p in docker_packages if p.is_changed()]),
+    )
+
     # Replace old lines of dockerfile with updated pinned versions
     old_lines = dfp.lines
     new_lines = dfp.lines.copy()
@@ -423,7 +432,8 @@ def main(args: argparse.Namespace) -> None:
     if args.write:
         # Write lines to DockerfileParser setter, writing to dockerfile
         dfp.lines = new_lines
-    else:
+
+    if args.stdout:
         sys.stdout.writelines(new_lines)
 
     if args.diff:
@@ -469,7 +479,14 @@ if __name__ == "__main__":
         "--write",
         default=False,
         action="store_true",
-        help="write result to file instead of stdout",
+        help="write result to file",
+    )
+    _parser.add_argument(
+        "-o",
+        "--stdout",
+        default=False,
+        action="store_true",
+        help="print result to stdout",
     )
     _parser.add_argument(
         "-d",
@@ -516,5 +533,5 @@ if __name__ == "__main__":
 
     _args = _parser.parse_args()
 
-    logging.getLogger().setLevel(logging.WARN)
+    logging.getLogger().setLevel(logging.INFO)
     main(_args)
