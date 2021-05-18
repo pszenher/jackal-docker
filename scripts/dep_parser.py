@@ -8,7 +8,6 @@ import collections
 import dataclasses
 import difflib
 import functools
-import json
 import logging
 import pickle
 import re
