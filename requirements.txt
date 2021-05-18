@@ -1,5 +1,5 @@
 apt_repo>=0.5
 docker>=3.4.1
 dockerfile_parse>=1.1.0
-python-apt>=1.8.4.3
+python-debian==0.1.39
 typing_extensions>=3.7.4.3

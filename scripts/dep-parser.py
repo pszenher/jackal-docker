@@ -1,3 +1,5 @@
+"""Update pinned apt versions in Dockerfile to latest version."""
+
 # Enable postponement of annotation evaluatoin
 from __future__ import annotations
 
@@ -15,38 +17,38 @@ import sys
 import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Tuple
 
-# TODO: replace unneeded apt import with apt_pkg.init() call
-import apt_pkg  # type: ignore
 import apt_repo  # type: ignore
 import docker  # type: ignore
+from debian import debian_support
 from dockerfile_parse import DockerfileParser  # type: ignore
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict  # pylint: disable=no-name-in-module
 else:
-    from typing_extensions import TypedDict
-
-apt_pkg.init()
+    from typing_extensions import Final, TypedDict
 
 
-class bcolors:
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKCYAN = "\033[96m"
-    OKGREEN = "\033[92m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[0m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
+class TermColors:  # pylint: disable=too-few-public-methods
+    """Class of ANSI escape sequences for terminal text formatting."""
+
+    RED: Final = "\033[91m"
+    BLUE: Final = "\033[94m"
+    GREEN: Final = "\033[92m"
+    CYAN: Final = "\033[96m"
+    YELLOW: Final = "\033[93m"
+    RESET: Final = "\033[0m"
+    BOLD: Final = "\033[1m"
+    UNDERLINE: Final = "\033[4m"
 
 
 class PinnedPackage:
+    """Object representing in-file apt package."""
+
     name: str
     lineno: int
-    _cur_version: Union[str, None] = None
+    _cur_version: Optional[str] = None
     _candidate_versions: List[str] = dataclasses.field(default_factory=list)
 
     def __init__(self, package_str: str, line_num: int) -> None:
@@ -62,45 +64,58 @@ class PinnedPackage:
 
     @property
     def cur_version(self) -> str:
+        """Return currently pinned package version as string."""
         if self._cur_version is None:
             return ""
-        else:
-            return self._cur_version
-
-    @property
-    def cur_string(self) -> str:
-        return f"{self.name}{'=' + self._cur_version if self._cur_version is not None else ''}"
-
-    @property
-    def new_string(self) -> str:
-        return f"{self.name}={self.newest_version}"
+        return self._cur_version
 
     @property
     def newest_version(self) -> str:
+        """Return newest available version of package as string."""
         if len(self._candidate_versions) == 0:
             raise RuntimeError(
                 f'Package "{self.name}" has no candidate versions to generate.'
             )
         return functools.reduce(
-            lambda x, y: x if apt_pkg.version_compare(x, y) > 0 else y,
+            lambda x, y: x if debian_support.version_compare(x, y) > 0 else y,
             self._candidate_versions,
         )
 
-    def is_changed(self) -> bool:
-        """Return bool describing if newest candidate package version differs from current version."""
-        return apt_pkg.version_compare(self.cur_version, self.newest_version) != 0
+    @property
+    def cur_string(self) -> str:
+        """Return current package pin string in "name=version" format."""
+        # FIXME: handle case where package is currently unpinned (no = sign)
+        return f"{self.name}={self.cur_version}"
 
-    def update_package(self, version: str) -> None:
-        """Append version to package _candidate_versions list.
+    @property
+    def new_string(self) -> str:
+        """Return replacement package pin string in "name=version" format."""
+        return f"{self.name}={self.newest_version}"
+
+    def is_changed(self) -> bool:
+        """Return true if newest package version has changed, false otherwise."""
+        return (
+            debian_support.version_compare(self.cur_version, self.newest_version) != 0
+        )
+
+    def add_candidate(self, version: str) -> None:
+        """Append version to package candidate versions.
 
         Keyword Parameters:
         version -- candidate version of package
         """
+        if version in self._candidate_versions:
+            logging.debug(
+                "Package %s already has candidate version %s, skipping",
+                self.name,
+                version,
+            )
+            return
         self._candidate_versions.append(version)
 
 
 class PinnedPackageList:
-    """List of PinnedPackage objects with helper methods for adding and updating packages."""
+    """List of PinnedPackage objects with methods for adding and updating packages."""
 
     packages: Dict[str, PinnedPackage]
 
@@ -122,15 +137,16 @@ class PinnedPackageList:
     def __len__(self):
         return len(self.packages.keys())
 
-    def __getitem__(self, key: str) -> PinnedPackage:
-        if key not in self.packages:
-            raise ValueError(f'Package name "{key}" is not in the package list.')
-        return self.packages[key]
-
     @property
     def names(self):
         """Return generator of all package names in PinnedPackageList."""
         yield from self.packages.keys()
+
+    def get_package(self, name: str) -> PinnedPackage:
+        """Get PinnedPackage by name."""
+        if name not in self.packages:
+            raise ValueError(f'Package name "{name}" is not in the package list.')
+        return self.packages[name]
 
     def add_package(self, package: PinnedPackage) -> None:
         """Add PinnedPackage to PinnedPackageList.
@@ -151,14 +167,14 @@ class PinnedPackageList:
         name -- name of target package
         version -- new candidate version
         """
-        self[name].update_package(version)
+        self.get_package(name).add_candidate(version)
 
 
 class AptDockerfileParser(DockerfileParser):
-    """Subclass of DockerfilleParser for handing apt install statements in RUN commands."""
+    """Subclass of DockerfileParser for parsing apt install commands."""
 
     class DockerfileCommand(TypedDict):
-        """TypedDict contract class for handling typed keys in DockerfileParser command dicts."""
+        """TypedDict class for handling typed keys in DockerfileParser command dicts."""
 
         instruction: str
         startline: int
@@ -169,6 +185,11 @@ class AptDockerfileParser(DockerfileParser):
     # TODO: handle multi-stage builds when parsing apt config
     @property
     def apt_pin_params(self) -> List[str]:
+        """Return list of Debian archive sources in "one-line-style" format.
+
+        See man sources.list(5) for one-line-style format syntax.
+        """
+
         # Initialize list of parameters
         repos = []
 
@@ -219,7 +240,7 @@ class AptDockerfileParser(DockerfileParser):
 
     @property
     def apt_packages(self) -> PinnedPackageList:
-        """Return PinnedPackageList containing all apt packages installed by dockerfile."""
+        """Return PinnedPackageList containing apt packages installed by Dockerfile."""
 
         pkg_list = []
         for command in filter(lambda cmd: cmd["instruction"] == "RUN", self.structure):
@@ -228,7 +249,8 @@ class AptDockerfileParser(DockerfileParser):
             tokens_linum = []
             tokens.lineno -= 1
             for token in tokens:
-                # TODO: fix in case of multiple consecutive comment lines (parsed as multiple commands)
+                # TODO: fix in case of multiple consecutive comment lines
+                #       (parsed as multiple commands)
                 tokens.lineno += sum(
                     (
                         c["endline"] + 1 - (command["startline"] + tokens.lineno)
@@ -345,9 +367,11 @@ def check_cache_validity(
 
 
 def main(args: argparse.Namespace) -> None:
+    """Main body of dependency parser script."""
     # Parse target dockerfile
     dfp = AptDockerfileParser(args.file.as_posix())
 
+    # TODO: wrap into custom class and unit test
     if args.sources_list is not None:
         with open(args.sources_list, "r") as sources_list_file:
             source_lines = sources_list_file.readlines()
@@ -374,7 +398,7 @@ def main(args: argparse.Namespace) -> None:
                     all_packages = pickle.load(cache_file)
             except (pickle.UnpicklingError, EOFError) as err:
                 logging.error(
-                    'Could not unpickle apt cache file "%s" ("%s"), try refreshing cache',
+                    'Could not unpickle apt cache "%s" ("%s"), try refreshing cache',
                     cache_path,
                     err,
                 )
@@ -452,10 +476,10 @@ def main(args: argparse.Namespace) -> None:
         )
 
         for find, replace in [
-            (r"^(\+{3}.*|-{3}.*)$", fr"{bcolors.BOLD}\1{bcolors.ENDC}"),
-            (r"^(\@{2}.*)$", fr"{bcolors.OKBLUE}\1{bcolors.ENDC}"),
-            (r"^(\+\s{4}.*)$", fr"{bcolors.OKGREEN}\1{bcolors.ENDC}"),
-            (r"^(-\s{4}.*)$", fr"{bcolors.FAIL}\1{bcolors.ENDC}"),
+            (r"^(\+{3}.*|-{3}.*)$", fr"{TermColors.BOLD}\1{TermColors.RESET}"),
+            (r"^(\@{2}.*)$", fr"{TermColors.BLUE}\1{TermColors.RESET}"),
+            (r"^(\+\s{4}.*)$", fr"{TermColors.GREEN}\1{TermColors.RESET}"),
+            (r"^(-\s{4}.*)$", fr"{TermColors.RED}\1{TermColors.RESET}"),
         ]:
             diff = [re.sub(find, replace, line) for line in diff]
 
@@ -522,7 +546,6 @@ if __name__ == "__main__":
         action="store",
         help="directory to store apt cache in (default %(default)s)",
     )
-    # TODO: use this argument for apt_repo sources
     _parser.add_argument(
         "--sources-list",
         type=Path,
