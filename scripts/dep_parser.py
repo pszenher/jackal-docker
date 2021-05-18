@@ -20,7 +20,6 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import apt_repo  # type: ignore
-import docker  # type: ignore
 from debian import debian_support
 from dockerfile_parse import DockerfileParser  # type: ignore
 
@@ -298,42 +297,6 @@ class AptDockerfileParser(DockerfileParser):
             last_token = token
 
         return pkg_list
-
-
-def docker_get_upgradable(image: str = "jackal-kinetic") -> Dict[str, str]:
-    """Return upgradable apt packages from docker image.
-
-    Keyword Parameters:
-    image -- name of docker image
-    """
-
-    docker_client = docker.from_env()
-    try:
-        stdout = docker_client.containers.run(
-            image=image,
-            command="python3 /apt-list-json.py -f new",
-            user="root",
-            volumes={
-                sys.path[0]
-                + "/apt-list-json.py": {"bind": "/apt-list-json.py", "mode": "ro"}
-            },
-            remove=True,
-            read_only=False,
-            detach=False,
-            stdout=True,
-        )
-
-    except docker.errors.ContainerError as err:
-        logging.error(
-            'Command "%s" in image "%s" returned non-zero exit status %i:',
-            err.command,
-            err.image,
-            err.exit_status,
-        )
-        logging.error(err.stderr.decode())
-        sys.exit(1)
-
-    return json.loads(stdout)
 
 
 def check_cache_validity(
