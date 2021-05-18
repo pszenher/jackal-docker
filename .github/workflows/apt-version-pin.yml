@@ -18,7 +18,7 @@ jobs:
       - name: Install Python requirements.txt
         run: pip install -r repo/requirements.txt
       - name: Run Dependency Parser
-        run: python3 repo/scripts/dep-parser.py -f repo/docker/jackal-kinetic.Dockerfile -w -d --no-cache
+        run: python3 repo/scripts/dep_parser.py -f repo/docker/jackal-kinetic.Dockerfile -w -d --no-cache
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3.9.1
         with:

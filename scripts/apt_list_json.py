@@ -1,34 +1,47 @@
+"""Output json apt list to stdout."""
+
 import argparse
 import json
 
 import apt  # type: ignore
 
 
-class CandidateFilter(apt.cache.Filter):
+class CandidateFilter(apt.cache.Filter):  # pylint: disable=too-few-public-methods
+    """Apt cache filter for packages with install candidates."""
+
     @staticmethod
     def apply(pkg: apt.package.Package) -> bool:
         return pkg.candidate is not None
 
 
-class UpgradableFilter(apt.cache.Filter):
+class UpgradableFilter(apt.cache.Filter):  # pylint: disable=too-few-public-methods
+    """Apt cache filter for packages with upgradable flag set."""
+
     @staticmethod
     def apply(pkg: apt.package.Package) -> bool:
         return pkg.is_upgradable
 
 
-class InstalledFilter(apt.cache.Filter):
+class InstalledFilter(apt.cache.Filter):  # pylint: disable=too-few-public-methods
+    """Apt cache filter for installed packages."""
+
     @staticmethod
     def apply(pkg: apt.package.Package) -> bool:
         return pkg.is_installed
 
 
-class UpgradableOrNotInstalledFilter(apt.cache.Filter):
+class UpgradableOrNotInstalledFilter(
+    apt.cache.Filter
+):  # pylint: disable=too-few-public-methods
+    """Apt cache filter for upgradable or not-installed packages."""
+
     @staticmethod
     def apply(pkg: apt.package.Package) -> bool:
         return pkg.is_upgradable or not pkg.is_installed
 
 
-def apt_filter(filter_name: str):
+def apt_filter(filter_name: str) -> apt.cache.Filter:
+    """Return corresponding filter object given string filter name."""
     if filter_name == "all":
         return CandidateFilter()
     if filter_name == "installed":
@@ -41,6 +54,8 @@ def apt_filter(filter_name: str):
 
 
 def main(args: argparse.Namespace) -> None:
+    """Main body of apt_list_json script."""
+
     # Open system apt cache
     full_cache = apt.cache.Cache()
     full_cache.update()
@@ -64,6 +79,6 @@ if __name__ == "__main__":
         metavar="[all|installed|upgradable|new]",
         help="Filter to apply to apt package list.",
     )
-    args = parser.parse_args()
+    _args = parser.parse_args()
 
-    main(args)
+    main(_args)

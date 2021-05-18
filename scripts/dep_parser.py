@@ -25,7 +25,7 @@ from debian import debian_support
 from dockerfile_parse import DockerfileParser  # type: ignore
 
 if sys.version_info >= (3, 8):
-    from typing import TypedDict  # pylint: disable=no-name-in-module
+    from typing import Final, TypedDict  # pylint: disable=no-name-in-module
 else:
     from typing_extensions import Final, TypedDict
 
