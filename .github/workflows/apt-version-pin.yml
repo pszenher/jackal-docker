@@ -20,6 +20,7 @@ jobs:
         with:
           fetch-depth: 0
           repository: pszenher/dockerfile-pin
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           ref: master
           path: dockerfile-pin
       - name: Install Python requirements.txt
