@@ -2,7 +2,7 @@ name: Build Dockerfiles
 on:
   push:
     branches: [master]
-  pull-request:
+  pull_request:
     branches: [master]
 jobs:
   jackal-kinetic:
@@ -17,4 +17,4 @@ jobs:
           ref: master
           path: repo
       - name: Build Dockerfile
-        run: docker build -f repo/docker/jackal-kinetic.Dockerfile
+        run: docker build -f repo/docker/jackal-kinetic.Dockerfile repo/docker
