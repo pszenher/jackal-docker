@@ -1,8 +1,8 @@
 #+TITLE: TODO Items for jackal-docker
 
-* TODO Project Architecture [0/3]
+* TODO Project Architecture [2/3]
 
-** TODO Spin version pinning scripts off into separate package
+** DONE Spin version pinning scripts off into separate package
    - Should have strong testing coverage with variety of cases for all methods
 
 ** TODO Implement unit/integration testing
@@ -11,22 +11,22 @@
     - All changes should come via PRs
     - This should only be done once repo is in stable state
 
-*** TODO Hadolint
+*** DONE Hadolint
     - should lint all dockerfiles and refuse merge upon error
 
-*** TODO Build test Dockerfiles
+*** DONE Build test Dockerfiles
     - should refuse merge on failure/warinings in build
 
 *** TODO Integration test Docker images
     - should run sanity-checks against built images
     - e.g. invoke ros commands, etc.
 
-** TODO Implement separate repo for building disk from Docker image
-*** TODO Create new github repo
+** DONE Implement separate repo for building disk from Docker image
+*** DONE Create new github repo
     - will be similar in spirit to https://github.com/iximiuz/docker-to-linux
     - commit local scripts
-*** TODO Implement CI
-*** TODO Integrate with ~jackal-docker~
+*** DONE Implement CI
+*** DONE Integrate with ~jackal-docker~
     - not guaranteed to be necessary, will need to consider the relationship between these repos
 * TODO Dockerfile Implementation(s) [1/8]
 
