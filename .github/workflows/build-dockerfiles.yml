@@ -1,0 +1,20 @@
+name: Build Dockerfiles
+on:
+  push:
+    branches: [master]
+  pull-request:
+    branches: [master]
+jobs:
+  jackal-kinetic:
+    name: Build jackal-kinetic.Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: ${{ github.repository }}
+          ref: master
+          path: repo
+      - name: Build Dockerfile
+        run: docker build -f repo/docker/jackal-kinetic.Dockerfile
