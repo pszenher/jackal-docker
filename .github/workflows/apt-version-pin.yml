@@ -15,10 +15,17 @@ jobs:
           repository: ${{ github.repository }}
           ref: master
           path: repo
+      - name: Checkout dockerfile-pin repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          repository: https://github.com/pszenher/dockerfile-pin.git
+          ref: master
+          path: dockerfile-pin
       - name: Install Python requirements.txt
-        run: pip install -r repo/requirements.txt
+        run: pip install -r dockerfile-pin/requirements.txt
       - name: Run Dependency Parser
-        run: python3 repo/scripts/dep_parser.py -f repo/docker/jackal-kinetic.Dockerfile -w -d --no-cache
+        run: python3 dockerfile-pin/dockerfile_parse.py -f repo/docker/jackal-kinetic.Dockerfile -w -d --no-cache
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3.9.1
         with:

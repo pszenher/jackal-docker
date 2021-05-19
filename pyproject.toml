@@ -1,7 +1,0 @@
-[tool.black]
-line-length = 88                # Default black line length limit
-target-version = ['py37']       # Target python 3.7
-
-[tool.isort]
-profile = "black"               # Enable isort black compatibility mode
-multi_line_output = 3
