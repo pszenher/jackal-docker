@@ -35,16 +35,28 @@
 ** TODO Networking
 *** DONE Fill in ~interfaces~ file
    - Should contain configuration for Velodyne-connected NIC
-*** TODO Get real device names
+*** DONE Get real device names
    - Should use device names from jackal ~biosdevname~ (will need to boot physical jackal to test this)
+   - eno1, enp2s0, and wlp1s0
 
 ** TODO PS4 Controller
 *** DONE Check Clearpath PS4 configruation procedure
      - ensure that it is replicated/replaced within Dockerfile environments
-*** TODO Get MAC addresses of all PS4 controllers
+*** DONE Get MAC addresses of all PS4 controllers
     - Will require trip to lab
+**** Controller MAC Addresses and Info
+     Red Controller:
+     - MAC: 1C:A0:B8:0D:0F:C3
+
+     Old Black Controller:
+     - MAC: DC:0C:2D:71:8D:0C
+
+     New Black Controller:
+     - MAC: 1C:A0:B8:EC:04:CB
+
 *** TODO Examine bluetoothctl config
     - Determine if configuration can be saved directly instead of running bluetoothctl commands
+    - See https://wiki.archlinux.org/title/bluetooth#Dual_boot_pairing
 
 ** TODO Serial access over null-modem cable
    - Should be able to plug-and-play cable in to any Jackal USB port and receive a working terminal promt
@@ -85,7 +97,7 @@
 *** TODO ROS 2
     - Consider producing Jackal configuration for ROS 2
 
-* TODO Image Export Script(s) [5/8]
+* TODO Image Export Script(s) [5/9]
 
 ** +Remove calls as root user+
    - +should not need to use kernel drivers to mount loopback devices and init an ext4 fs+
@@ -119,3 +131,14 @@
    - should be enabled via use of a command line flag
 ** TODO Cleanup reliance on sudo
    - might be cleaner to require that the script be run as root?
+** TODO Handle missing dependencies
+*** Current deps:
+   Required
+   - extlinux (required)
+
+   Optional:
+   - pv
+   - jq
+   - udevadm
+*** Consider using docker
+    create docker image with deps installed
