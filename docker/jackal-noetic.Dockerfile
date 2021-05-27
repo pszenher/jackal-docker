@@ -1,19 +1,19 @@
-FROM ubuntu:xenial-20210416
-# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial main universe multiverse restricted"
-# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial-security main universe multiverse restricted"
-# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial-updates main universe multiverse restricted"
-# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ xenial-backports main universe multiverse restricted"
-# apt-pin: repo="deb https://mirrors.osuosl.org/pub/ros/packages.ros.org/ros/ubuntu xenial main"
-# apt-pin: repo="deb https://packages.clearpathrobotics.com/stable/ubuntu xenial main"
+FROM ubuntu:focal-20210416
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ focal main universe multiverse restricted"
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ focal-security main universe multiverse restricted"
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ focal-updates main universe multiverse restricted"
+# apt-pin: repo="deb http://archive.ubuntu.com/ubuntu/ focal-backports main universe multiverse restricted"
+# apt-pin: repo="deb https://mirrors.osuosl.org/pub/ros/packages.ros.org/ros/ubuntu focal main"
+# apt-pin: repo="deb https://packages.clearpathrobotics.com/stable/ubuntu focal main"
 
-ENV ROS_DISTRO=kinetic
+ENV ROS_DISTRO=noetic
+
 ARG ROS_URL="https://mirrors.osuosl.org/pub/ros/packages.ros.org"
 ARG CLEARPATH_URL="https://packages.clearpathrobotics.com"
 ARG DEBIAN_FRONTEND="noninteractive"
 
 USER root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
 
 # ====================================================================
 # | Package Management and Configuration                             |
@@ -23,56 +23,57 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # System packages
-    build-essential=12.1ubuntu2 \
-    ca-certificates=20210119~16.04.1 \
-    curl=7.47.0-1ubuntu2.19 \
-    dhcpcd5=6.10.1-1 \
-    gnupg2=2.1.11-6ubuntu2.1 \
-    software-properties-common=0.96.20.10 \
+    build-essential=12.8ubuntu1.1 \
+    ca-certificates=20210119~20.04.1 \
+    curl=7.68.0-1ubuntu2.5 \
+    dhcpcd5=7.1.0-2build1 \
+    gnupg=2.2.19-3ubuntu2.1 \
+    python-is-python3=3.8.2-4 \
+    software-properties-common=0.98.9.5 \
     \
     # Package management packages
-    apt-transport-https=1.2.35 \
-    python-pip=8.1.1-2ubuntu0.6 \
-    python3-pip=8.1.1-2ubuntu0.6 \
+    apt-transport-https=2.0.5 \
+    python3-pip=20.0.2-5ubuntu1.5 \
     \
     # Linux kernel/init packages
-    initramfs-tools=0.122ubuntu8.17 \
-    linux-image-generic=4.4.0.210.216 \
-    systemd-sysv=229-4ubuntu21.31 \
+    initramfs-tools=0.136ubuntu6.5 \
+    linux-image-generic=5.4.0.73.76 \
+    systemd-sysv=245.4-4ubuntu3.6 \
     \
     # Sysadmin tool packages
     git=* \
-    htop=2.0.1-1ubuntu1 \
-    less=481-2.1ubuntu0.2 \
-    openssh-server=1:7.2p2-4ubuntu2.10 \
-    screen=4.3.1-2ubuntu0.1 \
-    vim=2:7.4.1689-3ubuntu1.5 \
-    wicd-curses=1.7.4+tb2-1 \
+    htop=2.2.0-2build1 \
+    less=551-1ubuntu0.1 \
+    openssh-server=1:8.2p1-4ubuntu0.2 \
+    screen=4.8.0-1ubuntu0.1 \
+    vim=2:8.1.2269-1ubuntu5 \
     \
     && rm -rf /var/lib/apt/lists/*
 
 # Add ROS and Clearpath deb package repos
-RUN echo "deb ${ROS_URL}/ros/ubuntu/ xenial main" > /etc/apt/sources.list.d/ros-latest.list &&\
+RUN echo "deb ${ROS_URL}/ros/ubuntu/ focal main" > /etc/apt/sources.list.d/ros-latest.list &&\
     curl -sSL "${ROS_URL}/ros.key" | apt-key add - \
     && \
-    echo "deb ${CLEARPATH_URL}/stable/ubuntu xenial main" > /etc/apt/sources.list.d/clearpath-latest.list &&\
+    echo "deb ${CLEARPATH_URL}/stable/ubuntu focal main" > /etc/apt/sources.list.d/clearpath-latest.list &&\
     curl -sSL "${CLEARPATH_URL}/public.key" | apt-key add -
 
 # Install deb packages from newly installed repos
 RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Jackal ROS Packages
-    python-catkin-tools=0.6.1-1 \
-    python-rosdep=0.20.1-1 \
-    python-rosinstall=0.7.8-1 \
-    python-rosinstall-generator=0.1.22-1 \
-    python-wstool=0.1.17-1 \
-    ros-kinetic-robot=1.3.2-0xenial-20210503-155848-0800 \
-    ros-kinetic-ros-base=1.3.2-0xenial-20210503-151705-0800 \
+    python3-catkin-tools=0.5.0-1 \
+    python3-osrf-pycommon=0.1.9-1 \
+    python3-rosdep=0.20.1-1 \
+    python3-rosinstall=0.7.8-4 \
+    python3-rosinstall-generator=0.1.22-1 \
+    python3-wstool=0.1.18-2 \
+    ros-noetic-robot=1.5.0-1focal.20210424.004447 \
+    ros-noetic-ros-base=1.5.0-1focal.20210424.000635 \
     \
     # Jackal Clearpath Packages
-    python-ds4drv=0.5.2xenial \
-    ros-kinetic-jackal-robot=0.5.1-1xenial-20210310-162855-0500 \
+    python-ds4drv=0.6.8-focal \
+    ros-noetic-jackal-base=0.7.0-2focal.20210507.231810 \
+    ros-noetic-jackal-bringup=0.7.0-2focal.20210507.232113 \
     \
     && rm -rf /var/lib/apt/lists/*
 
@@ -99,8 +100,7 @@ RUN source /etc/ros/setup.bash && \
 # ====================================================================
 
 # Set defaults for username and password
-# Set username as ENV for inheritance into child image builds
-ENV JACKAL_USER="administrator"
+ARG JACKAL_USER="administrator"
 ARG JACKAL_PASSWORD="clearpath"
 
 # Add $JACKAL_USER user with group memberships and hashed password
