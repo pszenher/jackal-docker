@@ -76,16 +76,16 @@
     1. TagSLAM
 
 ** TODO Other ROS Versions
-*** TODO ROS Melodic
+*** DONE ROS Melodic
    - Implement Dockerfile for ROS Melodic on Ubuntu 18.04
 
-*** TODO ROS Noetic
+*** DONE ROS Noetic
    - Implement Dockerfile for ROS Noetic on Ubuntu 20.04
 
 *** TODO ROS 2
     - Consider producing Jackal configuration for ROS 2
 
-* TODO Image Export Script(s) [5/8]
+* TODO Image Export Script(s) [6/10]
 
 ** +Remove calls as root user+
    - +should not need to use kernel drivers to mount loopback devices and init an ext4 fs+
@@ -108,14 +108,25 @@
 ** DONE Add support for flashing physical mSata HDD directly
    - should be able to format and write to a physical disk without the itermediate ~raw~ disk image stage
 
-** TODO Implement testing of output image
-   - use qemu to sanity check (does image boot, have an init, etc.)
+** DONE Cleanup reliance on sudo
+   - might be cleaner to require that the script be run as root?
 ** DONE Reduce unformatted writes to stderr
    - utilities run within the script should have output suppressed when ~debug~ flag is not passed
    - can also format output using ~log~ function if structure is amenable to that
+** TODO Implement testing of output image
+   - use qemu to sanity check (does image boot, have an init, etc.)
 ** TODO Implement update function
    - should be able to update an existing image from the same docker image
    - would use a utility like ~rsync~ to copy the filesystem more quickly by preserving unchanged files
    - should be enabled via use of a command line flag
-** TODO Cleanup reliance on sudo
-   - might be cleaner to require that the script be run as root?
+** TODO Add image validation
+   - should check target docker image to verify that a kernel is available before writing it to disk
+** TODO Add additional options
+*** TODO Add option to use mbr.bin from specific docker image
+    - would use ~docker cp~ command
+*** TODO Add option to automatically size output image
+    - would used same query of docker json used for pv
+*** TODO Add option to disable validation of target image
+    - should prevent script from exiting prematurely when handling an image that lacks a kernel in the normal position
+** TODO Add Dockerfile linting
+   - hadolint and dockerfileparse as github actions
