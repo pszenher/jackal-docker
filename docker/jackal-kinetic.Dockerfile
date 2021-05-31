@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     systemd-sysv=229-4ubuntu21.31 \
     \
     # Sysadmin tool packages
-    git=* \
+    git=1:2.7.4-0ubuntu1.10 \
     htop=2.0.1-1ubuntu1 \
     less=481-2.1ubuntu0.2 \
     openssh-server=1:7.2p2-4ubuntu2.10 \
