@@ -6,16 +6,17 @@ FROM pszenher/jackal:${ROS_DISTRO}
 # ====================================================================
 
 USER root
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Clone source code for github packages
 RUN mkdir -p /etc/ros/catkin_ws/{src,deps} && \
     git clone --branch "4.0.2" --depth=1 "https://github.com/borglab/gtsam" "/etc/ros/catkin_ws/deps/gtsam" && \
     git clone --depth=1 "https://github.com/pszenher/LIO-SAM" "/etc/ros/catkin_ws/src/LIO-SAM" && \
-    git clone --depth=1 "https://github.com/RobustFieldAutonomyLab/BGK_traversability_mapping" "/etc/ros/catkin_ws/src/BGK_traversability_mapping" && \
-    git clone --depth=1 "https://github.com/RobustFieldAutonomyLab/LeGO-LOAM" "/etc/ros/catkin_ws/src/LeGO-LOAM" && \
-    git clone --depth=1 "https://github.com/RobustFieldAutonomyLab/la3dm" "/etc/ros/catkin_ws/src/la3dm"
+    git clone --depth=1 "https://github.com/pszenher/BGK_traversability_mapping" "/etc/ros/catkin_ws/src/BGK_traversability_mapping" && \
+    git clone --depth=1 "https://github.com/pszenher/LeGO-LOAM" "/etc/ros/catkin_ws/src/LeGO-LOAM" && \
+    git clone --depth=1 "https://github.com/pszenher/la3dm" "/etc/ros/catkin_ws/src/la3dm"
 # TODO: review spin_hokuyo library dependencies to allow install
-# git clone --depth=1 "https://github.com/RobustFieldAutonomyLab/spin_hokuyo" "/etc/ros/catkin_ws/src/spin_hokuyo"
+# git clone --depth=1 "https://github.com/pszenher/spin_hokuyo" "/etc/ros/catkin_ws/src/spin_hokuyo"
 
 # # Build ROS packages from source, install ROS bringup launch files
 # # hadolint ignore=SC1091
@@ -26,3 +27,5 @@ RUN mkdir -p /etc/ros/catkin_ws/{src,deps} && \
 #     # catkin config --workspace "/etc/ros/catkin_ws" --install-space "/opt/ros/${ROS_DISTRO}" --install && \
 #     catkin build --workspace "/etc/ros/catkin_ws"
 
+# Switch to $JACKAL_USER user (inherited from parent image)
+USER "${JACKAL_USER}"
