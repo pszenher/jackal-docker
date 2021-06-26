@@ -63,7 +63,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Jackal ROS Packages
     python-catkin-tools=0.6.1-1 \
-    python-rosdep=0.20.1-1 \
+    python-rosdep=0.21.0-1 \
     python-rosinstall=0.7.8-1 \
     python-rosinstall-generator=0.1.22-1 \
     python-wstool=0.1.17-1 \
