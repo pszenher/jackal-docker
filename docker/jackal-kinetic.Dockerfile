@@ -127,6 +127,5 @@ RUN source /etc/ros/setup.bash && \
 # Set working directory to user home dir
 WORKDIR "/home/${JACKAL_USER}"
 
-
 # Set default command to bash
 CMD ["/bin/bash"]
