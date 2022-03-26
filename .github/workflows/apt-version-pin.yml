@@ -29,8 +29,12 @@ jobs:
           path: dockerfile-pin
       - name: Install Python requirements.txt
         run: pip install -r dockerfile-pin/requirements.txt
-      - name: Run Dependency Parser
+      - name: Run Dependency Parser Kinetic
         run: python3 dockerfile-pin/dockerfile_pin.py repo/docker/jackal-kinetic.Dockerfile -w -d --no-cache
+      - name: Run Dependency Parser Melodic
+        run: python3 dockerfile-pin/dockerfile_pin.py repo/docker/jackal-melodic.Dockerfile -w -d --no-cache
+      - name: Run Dependency Parser Noetic
+        run: python3 dockerfile-pin/dockerfile_pin.py repo/docker/jackal-noetic.Dockerfile -w -d --no-cache
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3.9.1
         with:
