@@ -72,7 +72,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Jackal Clearpath Packages
     python-ds4drv=0.5.2xenial \
-    ros-kinetic-jackal-robot=0.5.1-1xenial-20210930-222111-0500 \
+    ros-kinetic-jackal-robot=0.5.1-1xenial-20220217-061115-0500 \
     \
     && rm -rf /var/lib/apt/lists/*
 
