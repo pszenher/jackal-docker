@@ -24,29 +24,29 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # System packages
     build-essential=12.4ubuntu1 \
-    ca-certificates=20210119~18.04.1 \
-    curl=7.58.0-2ubuntu3.13 \
+    ca-certificates=20210119~18.04.2 \
+    curl=7.58.0-2ubuntu3.16 \
     dhcpcd5=6.11.5-0ubuntu1 \
     gnupg=2.2.4-1ubuntu1.4 \
-    software-properties-common=0.96.24.32.14 \
+    software-properties-common=0.96.24.32.18 \
     \
     # Package management packages
-    apt-transport-https=1.6.13 \
-    python-pip=9.0.1-2.3~ubuntu1.18.04.4 \
-    python3-pip=9.0.1-2.3~ubuntu1.18.04.4 \
+    apt-transport-https=1.6.14 \
+    python-pip=9.0.1-2.3~ubuntu1.18.04.5 \
+    python3-pip=9.0.1-2.3~ubuntu1.18.04.5 \
     \
     # Linux kernel/init packages
-    initramfs-tools=0.130ubuntu3.12 \
-    linux-image-generic=4.15.0.143.130 \
-    systemd-sysv=237-3ubuntu10.47 \
+    initramfs-tools=0.130ubuntu3.13 \
+    linux-image-generic=4.15.0.173.162 \
+    systemd-sysv=237-3ubuntu10.53 \
     \
     # Sysadmin tool packages
-    git=* \
+    git=1:2.17.1-1ubuntu0.9 \
     htop=2.1.0-3 \
     less=487-0.1 \
-    openssh-server=1:7.6p1-4ubuntu0.3 \
+    openssh-server=1:7.6p1-4ubuntu0.6 \
     screen=4.6.2-1ubuntu1.1 \
-    vim=2:8.0.1453-1ubuntu1.4 \
+    vim=2:8.0.1453-1ubuntu1.8 \
     wicd-curses=1.7.4+tb2-5 \
     \
     && rm -rf /var/lib/apt/lists/*
@@ -63,16 +63,16 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Jackal ROS Packages
     python-catkin-tools=0.6.1-1 \
-    python-rosdep=0.20.1-1 \
+    python-rosdep=0.21.0-1 \
     python-rosinstall=0.7.8-1 \
     python-rosinstall-generator=0.1.22-1 \
     python-wstool=0.1.17-1 \
-    ros-melodic-robot=1.4.1-0bionic.20210505.053322 \
-    ros-melodic-ros-base=1.4.1-0bionic.20210505.053238 \
+    ros-melodic-robot=1.4.1-0bionic.20220222.195843 \
+    ros-melodic-ros-base=1.4.1-0bionic.20220222.193734 \
     \
     # Jackal Clearpath Packages
     python-ds4drv=0.5.8-bionic \
-    ros-melodic-jackal-robot=0.6.2-1bionic.20210429.202740 \
+    ros-melodic-jackal-robot=0.6.4-1bionic.20220217.114645 \
     \
     && rm -rf /var/lib/apt/lists/*
 
