@@ -24,29 +24,29 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # System packages
     build-essential=12.4ubuntu1 \
-    ca-certificates=20210119~18.04.2 \
-    curl=7.58.0-2ubuntu3.16 \
+    ca-certificates=20230311ubuntu0.18.04.1 \
+    curl=7.58.0-2ubuntu3.24 \
     dhcpcd5=6.11.5-0ubuntu1 \
-    gnupg=2.2.4-1ubuntu1.4 \
-    software-properties-common=0.96.24.32.18 \
+    gnupg=2.2.4-1ubuntu1.6 \
+    software-properties-common=0.96.24.32.22 \
     \
     # Package management packages
-    apt-transport-https=1.6.14 \
-    python-pip=9.0.1-2.3~ubuntu1.18.04.5 \
-    python3-pip=9.0.1-2.3~ubuntu1.18.04.5 \
+    apt-transport-https=1.6.17 \
+    python-pip=9.0.1-2.3~ubuntu1.18.04.8 \
+    python3-pip=9.0.1-2.3~ubuntu1.18.04.8 \
     \
     # Linux kernel/init packages
     initramfs-tools=0.130ubuntu3.13 \
-    linux-image-generic=4.15.0.173.162 \
-    systemd-sysv=237-3ubuntu10.53 \
+    linux-image-generic=4.15.0.212.195 \
+    systemd-sysv=237-3ubuntu10.57 \
     \
     # Sysadmin tool packages
-    git=1:2.17.1-1ubuntu0.9 \
+    git=1:2.17.1-1ubuntu0.18 \
     htop=2.1.0-3 \
     less=487-0.1 \
-    openssh-server=1:7.6p1-4ubuntu0.6 \
+    openssh-server=1:7.6p1-4ubuntu0.7 \
     screen=4.6.2-1ubuntu1.1 \
-    vim=2:8.0.1453-1ubuntu1.8 \
+    vim=2:8.0.1453-1ubuntu1.13 \
     wicd-curses=1.7.4+tb2-5 \
     \
     && rm -rf /var/lib/apt/lists/*
@@ -63,12 +63,12 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Jackal ROS Packages
     python-catkin-tools=0.6.1-1 \
-    python-rosdep=0.21.0-1 \
+    python-rosdep=0.22.2-1 \
     python-rosinstall=0.7.8-1 \
-    python-rosinstall-generator=0.1.22-1 \
+    python-rosinstall-generator=0.1.23-1 \
     python-wstool=0.1.17-1 \
-    ros-melodic-robot=1.4.1-0bionic.20220222.195843 \
-    ros-melodic-ros-base=1.4.1-0bionic.20220222.193734 \
+    ros-melodic-robot=1.4.1-0bionic.20230302.132118 \
+    ros-melodic-ros-base=1.4.1-0bionic.20230215.205719 \
     \
     # Jackal Clearpath Packages
     python-ds4drv=0.5.8-bionic \
