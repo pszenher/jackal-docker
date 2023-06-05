@@ -98,6 +98,11 @@ RUN mkdir -p "${JACKAL_WS}/src" \
     ${GIT_CLONE} "${GITHUB}/micro-ROS/micro-ros-agent.git" "${JACKAL_WS}/src/micro_ros_agent" \
     --branch "1.5.4" \
     && \
+    # FIXME: error in vlp16_mount.urdf.xacro (tower parameter passed
+    # from accessories.urdf.xacro, but does not exist in vlp16...
+    # 
+    # TODO: is this a bug on the 1.0.4 release only (upgrade to a
+    # different commit?), or do we need to patch?
     ${GIT_CLONE} "${GITHUB}/jackal/jackal.git"             "${JACKAL_WS}/src/jackal" \
     --branch "1.0.4" \
     && \
@@ -128,16 +133,34 @@ RUN source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
 # Merge system folder config files into root filesystem
 COPY ./root-filesystem/. /
 
-# Set system networking config
-RUN echo "jackal-${ROS_DISTRO}"                > "/etc/hostname" && \
-    echo "127.0.0.1	localhost"             > "/etc/hosts"    && \
-    echo "127.0.1.1	jackal-${ROS_DISTRO}" >> "/etc/hosts"
+# FIXME: hostname overwritten at container startup, would need to hit
+#        it with an entrypoisnt or other post-processing macro for it
+#        to land in the final image...
+# 
+# # Set system networking config
+# RUN echo "jackal-${ROS_DISTRO}"                > "/etc/hostname" && \
+#     echo "127.0.0.1	localhost"             > "/etc/hosts"    && \
+#     echo "127.0.1.1	jackal-${ROS_DISTRO}" >> "/etc/hosts"
 
 # Add configuration to global setup.bash
 RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}"  /etc/ros/setup.bash && \
     echo "source ${JACKAL_WS}/install/setup.bash" >> /etc/ros/setup.bash
 
 # Install default robot_upstart systemd jobs
+# 
+# FIXME: for some reason this systemd service isn't making it into the
+#        final disk image, is Docker getting in the way?
+#
+# FIXME: the backing launch file that this installs
+#        (bringup.launch.py) should be audited and understood.  It
+#        demands opening of a "/dev/jackal" device file (alias for MCU
+#        serial?), but it's not found (microstrain udev rule takes
+#        the dev, no clearpath rule for this afaik).
+#
+# TODO: read through clearpath docs again to see if they have a
+#       solution for this, or if their ros2 code is too unstable
+#       currently.  Also consider configuring the systemd job later in
+#       the docker image...
 RUN source "/etc/ros/setup.bash" && /etc/ros/install_ros2_bringup.py
 
 
@@ -150,7 +173,7 @@ ARG JACKAL_USER="administrator"
 ARG JACKAL_PASSWORD="clearpath"
 
 # Add $JACKAL_USER user with group memberships and hashed password
-RUN useradd -mUG "sudo" "${JACKAL_USER}" && \
+RUN useradd -mUG "sudo" -s "/bin/bash" "${JACKAL_USER}" && \
     echo "${JACKAL_USER}:${JACKAL_PASSWORD}" \
     | chpasswd
 
@@ -169,6 +192,24 @@ RUN ${APT_UPDATE} && ${APT_INSTALL} \
     live-boot-initramfs-tools \
     extlinux \
     squashfs-tools \
+    \
+    && ${APT_CACHE_PURGE}
+
+# Install Ubuntu live boot enablement package(s)
+RUN ${APT_UPDATE} && ${APT_INSTALL} \
+    \
+    # ip command suite for network interface inspection/control
+    iproute2 \
+    # hardware query tooling
+    pciutils \
+    usbutils \
+    # bluetooth control commands (for ps4 controller connectivity)
+    bluez \
+    bluez-tools \
+    \
+    # We're missing key packages w/o this (ros2launch, launch_ros, etc.)
+    # TODO:  do we need ros-${ROS_DISTRO}-base as well?
+    ros-${ROS_DISTRO}-core
     \
     && ${APT_CACHE_PURGE}
 
