@@ -1,0 +1,24 @@
+* Velodyne Driver Defaults
+#+begin_quote
+/velodyne_driver_node:
+  ros__parameters:
+    cut_angle: 6.283185307179586
+    device_ip: 192.168.1.201
+    diagnostic_updater:
+      period: 0.2
+    enabled: true
+    frame_id: velodyne
+    gps_time: false
+    model: VLP16
+    pcap: ''
+    port: 2368
+    read_fast: false
+    read_once: false
+    repeat_delay: 0.0
+    rpm: 600.0
+    time_offset: 0.0
+    use_sim_time: false
+#+end_quote
+
+* Velodyne PCAP Source
+- https://data.kitware.com/#folder/5b7fff608d777f06857cb539

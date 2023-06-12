@@ -1,16 +1,15 @@
 FROM ubuntu:focal-20230412
 
-
 # ====================================================================
 # Boilerplate Configuration
 # ====================================================================
 
+# Declare ROS distribution environment variable
+ENV ROS_DISTRO=foxy
+
 # Configure user and build shell shell
 USER root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Declare ROS distribution environment variable
-ENV ROS_DISTRO=foxy
 
 # Declare misc helper constants
 ARG GITHUB="https://github.com"
@@ -40,7 +39,6 @@ ENV LC_ALL="C.UTF-8"
 # Configure timezone
 RUN echo 'Etc/UTC' > /etc/timezone && \
     ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime
-
 
 # ====================================================================
 # | Package Management and Configuration                             |
@@ -77,7 +75,7 @@ RUN ${APT_UPDATE} && ${APT_INSTALL} \
     \
     && ${APT_CACHE_PURGE}
 
-# Add ROS and Clearpath deb package repos
+# Add ROS deb package repos
 RUN echo "deb ${ROS_URL}/ros2/ubuntu focal main" > /etc/apt/sources.list.d/ros-latest.list &&\
     curl -sSL "${ROS_URL}/ros.key" | apt-key add -
 
@@ -125,16 +123,51 @@ RUN source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
     --build-base   "${JACKAL_WS}/build" \
     --install-base "${JACKAL_WS}/install"
 
+# Install misc utils
+RUN ${APT_UPDATE} && ${APT_INSTALL} \
+    \
+    # live-boot \
+    # live-boot-initramfs-tools \
+    # extlinux \
+    # squashfs-tools \
+    \
+    # ip command suite for network interface inspection/control
+    iproute2 \
+    # hardware query tooling
+    pciutils \
+    usbutils \
+    # bluetooth control commands (for ps4 controller connectivity)
+    bluez \
+    bluez-tools \
+    \
+    # We're missing key packages w/o this (ros2launch, launch_ros, etc.)
+    # TODO:  do we need ros-${ROS_DISTRO}-base as well?
+    ros-${ROS_DISTRO}-ros-core \
+    \
+    && ${APT_CACHE_PURGE}
+# TODO: python-ds4drv in this? (from jackal.sh in new install img)
+
 
 # ====================================================================
 # | Root Filesystem Configuration                                    |
 # ====================================================================
 
 # Merge system folder config files into root filesystem
-COPY ./root-filesystem/. /
+COPY ./root-filesystem /tmp/docker-root-overlay
+RUN cd /tmp/docker-root-overlay && \
+    find . \
+    -type f \
+    -exec bash -c \
+    'path="{}"; \
+    d=/$(dirname "$path"); \
+    mkdir -p "$d" ; \
+    cp "$path" "$d"' \;
+# RUN  rsync -aR --no-o --no-g --no-implied-dirs --ignore-existing \
+#     /tmp/docker-root-overlay/./ \
+#     /
 
 # FIXME: hostname overwritten at container startup, would need to hit
-#        it with an entrypoisnt or other post-processing macro for it
+#        it with an entrypoint or other post-processing macro for it
 #        to land in the final image...
 # 
 # # Set system networking config
@@ -161,7 +194,14 @@ RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}"  /etc/ros/setup.bash && \
 #       solution for this, or if their ros2 code is too unstable
 #       currently.  Also consider configuring the systemd job later in
 #       the docker image...
-RUN source "/etc/ros/setup.bash" && /etc/ros/install_ros2_bringup.py
+
+# Rather than using robot_upstart directly, just use the pre-templated
+# script and systemd service (plus symlink)
+RUN ln -s \
+    /lib/systemd/system/ros2.service \
+    /etc/systemd/system/multi-user.target.wants/ros2.service
+
+# RUN source "/etc/ros/setup.bash" && /etc/ros/install_ros2_bringup.py
 
 
 # ====================================================================
@@ -181,40 +221,19 @@ RUN useradd -mUG "sudo" -s "/bin/bash" "${JACKAL_USER}" && \
 COPY ./home-directory/. "/home/${JACKAL_USER}"
 RUN chown -R "${JACKAL_USER}:${JACKAL_USER}" "/home/${JACKAL_USER}"
 
-# # Symlink kernel into fs root directory
-# RUN ln -s /boot/vmlinuz /vmlinuz && \
-#     ln -s /boot/initrd.img /initrd.img
-
-# Install Ubuntu live boot enablement package(s)
-RUN ${APT_UPDATE} && ${APT_INSTALL} \
-    \
-    live-boot \
-    live-boot-initramfs-tools \
-    extlinux \
-    squashfs-tools \
-    \
-    && ${APT_CACHE_PURGE}
-
-# Install Ubuntu live boot enablement package(s)
-RUN ${APT_UPDATE} && ${APT_INSTALL} \
-    \
-    # ip command suite for network interface inspection/control
-    iproute2 \
-    # hardware query tooling
-    pciutils \
-    usbutils \
-    # bluetooth control commands (for ps4 controller connectivity)
-    bluez \
-    bluez-tools \
-    \
-    # We're missing key packages w/o this (ros2launch, launch_ros, etc.)
-    # TODO:  do we need ros-${ROS_DISTRO}-base as well?
-    ros-${ROS_DISTRO}-core
-    \
-    && ${APT_CACHE_PURGE}
-
-# TODO: include bluez, bluez-tools, python-ds4drv in this?
-# (from jackal.sh in new install img)
+# FIXME: hack to fix broken clearpath code, remove once resolved/new version used
+# TODO:  find out why accessories.urdf.xacro is so botched in clearpath's foxy-devel
+RUN sed -i \
+    's/tower="${tower}"//' \
+    "/jackal_ws/install/share/jackal_description/urdf/accessories.urdf.xacro" \
+    && \
+    sed -i \
+    's/JACKAL_3D_LASER/JACKAL_LASER_3D/' \
+    "/jackal_ws/install/share/jackal_robot/launch/accessories.launch.py" \
+    && \
+    sed -i \
+    's/open(config_velodyne_pointcloud_vlp16, /open(config_velodyne_pointcloud_vlp16.perform(lc), /' \
+    "/jackal_ws/install/share/jackal_robot/launch/accessories.launch.py"
 
 # Switch to $JACKAL_USER user
 USER "${JACKAL_USER}"
