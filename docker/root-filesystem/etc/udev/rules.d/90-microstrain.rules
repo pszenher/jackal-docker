@@ -1,3 +1,9 @@
+# NOTE: vendor:product combo 0483:5740 is the same as the Jackal MCU
+#       this file is relegated to 90-microstrain.rules (at time of
+#       writing), so as to allow 55-ros-foxy-jackal-firmware.rules to
+#       take precedence. (they both communicate over a
+#       "STMicroelectronics Virtual COM Port")
+
 # Universal rule for GX3/4/5 devices
 SUBSYSTEM=="tty", SUBSYSTEMS=="usb", ATTRS{product}=="Lord Inertial Sensor", SYMLINK="microstrain", MODE="0666"
 
