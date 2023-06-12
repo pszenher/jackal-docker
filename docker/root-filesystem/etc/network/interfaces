@@ -6,12 +6,18 @@ auto lo
 iface lo inet loopback
 
 # Primary network interface
-allow-hotplug eth0
-iface eth0 inet dhcp
+# old-jackal: c4:00:ad:07:f5:bc
+allow-hotplug enp3s0
+iface enp3s0 inet dhcp
 
 # Lidar-communication network interface
 # Note: 192.168.131.0/24 subnet required by Veloydne packets
-allow-hotplug eth1
-iface eth1 inet static
+# old-jackal: c4:00:ad:07:f5:bb
+allow-hotplug eno1
+iface eno1 inet static
     address 192.168.131.1
     netmask 255.255.255.0
+
+# Wireless Interface:  wlp2s0
+# Type (from docs, todo: confirm) Intel Centrino Advanced-N 6235
+# old-jackal: 7c:5c:f8:3b:ac:fe
