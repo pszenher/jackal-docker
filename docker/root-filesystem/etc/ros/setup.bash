@@ -21,10 +21,10 @@ source "/opt/ros/$ROS_DISTRO/setup.bash"
 # exported here as well.
 
 # TODO: properly fill-out mount and IP/host
-export JACKAL_LASER_3D="1"
+export JACKAL_LASER_3D="true"
 export JACKAL_LASER_3D_MODEL="vlp16"
-export JACKAL_LASER_3D_MOUNT=""
-export JACKAL_LASER_3D_HOST=""
+export JACKAL_LASER_3D_MOUNT="mid"
+export JACKAL_LASER_3D_HOST="192.168.131.20"
 export JACKAL_LASER_3D_OFFSET="0 0 0"
 export JACKAL_LASER_3D_RPY="0 0 0"
 
