@@ -40,6 +40,7 @@ ENV LC_ALL="C.UTF-8"
 RUN echo 'Etc/UTC' > /etc/timezone && \
     ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
+
 # ====================================================================
 # | Package Management and Configuration                             |
 # ====================================================================
@@ -58,7 +59,7 @@ RUN ${APT_UPDATE} && ${APT_INSTALL} \
     \
     # Software management packages
     apt-transport-https=2.0.9 \
-    python3-pip=20.0.2-5ubuntu1.8 \
+    python3-pip \
     \
     # Linux kernel/init packages
     initramfs-tools=0.136ubuntu6.7 \
@@ -71,7 +72,7 @@ RUN ${APT_UPDATE} && ${APT_INSTALL} \
     less=551-1ubuntu0.1 \
     openssh-server=1:8.2p1-4ubuntu0.7 \
     screen=4.8.0-1ubuntu0.1 \
-    vim=2:8.1.2269-1ubuntu5.14 \
+    vim \
     \
     && ${APT_CACHE_PURGE}
 
