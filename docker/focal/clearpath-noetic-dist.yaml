@@ -1,0 +1,1055 @@
+%YAML 1.1
+# ROS distribution file
+# see REP 141: http://ros.org/reps/rep-0141.html
+---
+release_platforms:
+  ubuntu:
+  - focal
+repositories:
+  acado:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/acado-release.git
+      version: 1.3.0-1
+    status: maintained
+  axis_camera:
+    doc:
+      type: git
+      url: https://github.com/ros-drivers/axis_camera.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/axis_camera-release.git
+      version: 0.4.7-1
+    source:
+      type: git
+      url: https://github.com/ros-drivers/axis_camera.git
+      version: noetic-devel
+    status: maintained
+  boxer:
+    doc:
+      type: git
+      url: https://github.com/boxer-cpr/boxer.git
+      version: noetic-devel
+    release:
+      packages:
+      - boxer_control
+      - boxer_description
+      - boxer_msgs
+      - boxer_navigation
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/boxer-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/boxer-cpr/boxer.git
+      version: noetic-devel
+    status: maintained
+  boxer_desktop:
+    doc:
+      type: git
+      url: https://github.com/boxer-cpr/boxer_desktop.git
+      version: noetic-devel
+    release:
+      packages:
+      - boxer_desktop
+      - boxer_viz
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/boxer_desktop-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/boxer-cpr/boxer_desktop.git
+      version: noetic-devel
+    status: maintained
+  boxer_robot:
+    doc:
+      type: git
+      url: https://github.com/boxer-cpr/boxer_robot.git
+      version: noetic-devel
+    release:
+      packages:
+      - boxer_base
+      - boxer_bringup
+      - boxer_robot
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/boxer_robot-release.git
+      version: 0.1.7-1
+    source:
+      type: git
+      url: https://github.com/boxer-cpr/boxer_robot.git
+      version: noetic-devel
+    status: maintained
+  boxer_simulator:
+    doc:
+      type: git
+      url: https://github.com/boxer-cpr/boxer_simulator.git
+      version: noetic-devel
+    release:
+      packages:
+      - boxer_gazebo
+      - boxer_simulator
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/boxer_simulator-release.git
+      version: 0.1.1-2
+    source:
+      type: git
+      url: https://github.com/boxer-cpr/boxer_simulator.git
+      version: noetic-devel
+    status: maintained
+  camera_info_manager_py:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/camera_info_manager_py-release.git
+      version: 0.3.1-1
+    status: maintained
+  canfestival_ros:
+    doc:
+      type: git
+      url: https://gitlab.clearpathrobotics.com/research/canfestival_ros.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/canfestival_ros-gbp.git
+      version: 0.10.0-1
+    source:
+      type: git
+      url: https://gitlab.clearpathrobotics.com/research/canfestival_ros.git
+      version: noetic-devel
+    status: maintained
+  cpr_common_msgs:
+    release:
+      packages:
+      - cpr_common_msgs
+      - cpr_common_srvs
+      - gpio_msgs
+      - led_array_msgs
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/boxer_gbp/cpr_common_msgs.git
+      version: 0.0.1-1
+  cpr_gazebo:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr_gazebo.git
+      version: noetic-devel
+    release:
+      packages:
+      - cpr_accessories_gazebo
+      - cpr_agriculture_gazebo
+      - cpr_empty_gazebo
+      - cpr_inspection_gazebo
+      - cpr_obstacle_gazebo
+      - cpr_office_gazebo
+      - cpr_orchard_gazebo
+      - gazebo_race_modules
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_gazebo-release.git
+      version: 0.2.7-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr_gazebo.git
+      version: noetic-devel
+    status: maintained
+  cpr_gps_common:
+    release:
+      packages:
+      - autonomy_msgs
+      - autonomy_msgs_utils
+      - cpr_autonomy_metrics
+      - cpr_diagnostics
+      - cpr_estop_monitor
+      - cpr_geodetic_survey
+      - cpr_gps_common
+      - cpr_gps_navigation_msgs
+      - cpr_outdoornav_support
+      - cpr_pointcloud_filter
+      - cpr_robot_indicators
+      - cpr_std_srvs
+      - mission_msgs
+      - nav_core_cpr
+      - nav_utils
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/cpr_gps_common-gbp.git
+      version: 0.3.0-1
+    status: maintained
+  cpr_gps_navigation:
+    release:
+      packages:
+      - cpr_gps_costmap_layers
+      - cpr_gps_localization
+      - cpr_gps_navigation
+      - cpr_gps_navigation_client
+      - cpr_gps_navigation_server
+      - cpr_gps_path_smoothing
+      - cpr_gps_safety
+      - cpr_lidar_odometry
+      - cpr_sbpl_lattice_planner
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/cpr_gps_navigation-gbp.git
+      version: 0.3.0-1
+    status: maintained
+  cpr_gps_tasks:
+    release:
+      packages:
+      - cpr_gps_camera_tasks
+      - cpr_gps_generic_tasks
+      - cpr_gps_tasks
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://gitlab.clearpathrobotics.com/gbp/cpr_gps_tasks-gbp.git
+      version: 0.3.0-1
+    status: maintained
+  cpr_indoornav_base:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr_indoornav_base.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_indoornav_base-release.git
+      version: 0.3.4-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr_indoornav_base.git
+      version: noetic-devel
+    status: developed
+  cpr_indoornav_dingo:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-dingo.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_indoornav_dingo-release.git
+      version: 0.3.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-dingo.git
+      version: noetic-devel
+    status: developed
+  cpr_indoornav_husky:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-husky.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_indoornav_husky-release.git
+      version: 0.3.5-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-husky.git
+      version: noetic-devel
+    status: developed
+  cpr_indoornav_jackal:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-jackal.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_indoornav_jackal-release.git
+      version: 0.3.4-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-jackal.git
+      version: noetic-devel
+    status: developed
+  cpr_indoornav_ridgeback:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-ridgeback.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_indoornav_ridgeback-release.git
+      version: 0.3.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-ridgeback.git
+      version: noetic-devel
+    status: developed
+  cpr_indoornav_tests:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-tests.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_indoornav_tests-release.git
+      version: 0.3.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr-indoornav-tests.git
+      version: noetic-devel
+    status: developed
+  cpr_onav_description:
+    doc:
+      type: git
+      url: https://github.com/cpr-application/cpr_onav_description.git
+      version: main
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_onav_description-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/cpr-application/cpr_onav_description.git
+      version: main
+    status: maintained
+  cpr_platform_tests:
+    release:
+      packages:
+      - boxer_tests
+      - dingo_tests
+      - husky_tests
+      - jackal_tests
+      - ridgeback_tests
+      - warthog_tests
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://gitlab.clearpathrobotics.com/gbp/cpr_platform_tests-gbp.git
+      version: 0.3.3-1
+  cpr_robot_customizer:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr_robot_customizer.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/cpr_robot_customizer-release.git
+      version: 0.1.0-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/cpr_robot_customizer.git
+      version: noetic-devel
+    status: developed
+  dingo:
+    doc:
+      type: git
+      url: https://github.com/dingo-cpr/dingo.git
+      version: melodic-devel
+    release:
+      packages:
+      - dingo_control
+      - dingo_description
+      - dingo_msgs
+      - dingo_navigation
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/dingo-release.git
+      version: 0.3.1-2
+    source:
+      type: git
+      url: https://github.com/dingo-cpr/dingo.git
+      version: melodic-devel
+    status: maintained
+  dingo_desktop:
+    doc:
+      type: git
+      url: https://github.com/dingo-cpr/dingo_desktop.git
+      version: master
+    release:
+      packages:
+      - dingo_desktop
+      - dingo_viz
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/dingo_desktop-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/dingo-cpr/dingo_desktop.git
+      version: master
+    status: maintained
+  dingo_firmware:
+    doc:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/dingo_firmware.git
+      version: noetic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/dingo_firmware-gbp.git
+      version: 0.3.3-1
+    source:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/dingo_firmware.git
+      version: noetic-devel
+    status: maintained
+  dingo_firmware_components:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/dingo_firmware_components.git
+      version: 2.9.15-1
+  dingo_robot:
+    doc:
+      type: git
+      url: https://github.com/dingo-cpr/dingo_robot.git
+      version: noetic-devel
+    release:
+      packages:
+      - dingo_base
+      - dingo_bringup
+      - dingo_robot
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/dingo_robot-release.git
+      version: 0.3.1-1
+    source:
+      type: git
+      url: https://github.com/dingo-cpr/dingo_robot.git
+      version: noetic-devel
+    status: maintained
+  dingo_simulator:
+    doc:
+      type: git
+      url: https://github.com/dingo-cpr/dingo_simulator.git
+      version: master
+    release:
+      packages:
+      - dingo_gazebo
+      - dingo_simulator
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/dingo_simulator-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/dingo-cpr/dingo_simulator.git
+      version: master
+    status: maintained
+  firmware_components:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/firmware_components-gbp.git
+      version: 2.9.5-1
+  flir_camera_driver:
+    doc:
+      type: git
+      url: https://github.com/ros-drivers/flir_camera_driver.git
+      version: noetic-devel
+    release:
+      packages:
+      - flir_camera_description
+      - flir_camera_driver
+      - spinnaker_camera_driver
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/ros-drivers-gbp/flir_camera_driver-release.git
+      version: 0.2.5-1
+    source:
+      type: git
+      url: https://github.com/ros-drivers/flir_camera_driver.git
+      version: noetic-devel
+    status: maintained
+  flir_ptu:
+    doc:
+      type: git
+      url: https://github.com/ros-drivers/flir_ptu.git
+      version: noetic-devel
+    release:
+      packages:
+      - flir_ptu_description
+      - flir_ptu_driver
+      - flir_ptu_viz
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/flir_ptu-release.git
+      version: 0.2.2-1
+    source:
+      type: git
+      url: https://github.com/ros-drivers/flir_ptu.git
+      version: noetic-devel
+    status: maintained
+  gps_mpc_navigation:
+    release:
+      packages:
+      - cpr_local_planner
+      - cpr_pathtracker
+      - gps_mpc_navigation
+      - grid_library
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://gitlab.clearpathrobotics.com/gbp/gps_mpc_navigation-gbp.git
+      version: 0.3.0-1
+    status: maintained
+  husky:
+    doc:
+      type: git
+      url: https://github.com/husky/husky.git
+      version: noetic-devel
+    release:
+      packages:
+      - husky_control
+      - husky_description
+      - husky_desktop
+      - husky_gazebo
+      - husky_msgs
+      - husky_navigation
+      - husky_simulator
+      - husky_viz
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/husky-release.git
+      version: 0.6.8-1
+    source:
+      type: git
+      url: https://github.com/husky/husky.git
+      version: noetic-devel
+    status: maintained
+  husky_robot:
+    doc:
+      type: git
+      url: https://github.com/husky/husky_robot.git
+      version: noetic-devel
+    release:
+      packages:
+      - husky_base
+      - husky_bringup
+      - husky_robot
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/husky_robot-release.git
+      version: 0.6.9-1
+    source:
+      type: git
+      url: https://github.com/husky/husky_robot.git
+      version: noetic-devel
+    status: maintained
+  jackal:
+    doc:
+      type: git
+      url: https://github.com/jackal/jackal.git
+      version: noetic-devel
+    release:
+      packages:
+      - jackal_control
+      - jackal_description
+      - jackal_msgs
+      - jackal_navigation
+      - jackal_tutorials
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/jackal-release.git
+      version: 0.8.8-1
+    source:
+      type: git
+      url: https://github.com/jackal/jackal.git
+      version: noetic-devel
+    status: maintained
+  jackal_desktop:
+    doc:
+      type: git
+      url: https://github.com/jackal/jackal_desktop.git
+      version: melodic-devel
+    release:
+      packages:
+      - jackal_desktop
+      - jackal_viz
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/jackal_desktop-release.git
+      version: 0.4.0-2
+    source:
+      type: git
+      url: https://github.com/jackal/jackal_desktop.git
+      version: melodic-devel
+    status: developed
+  jackal_firmware:
+    doc:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/jackal_firmware.git
+      version: noetic_devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/jackal_firmware-gbp.git
+      version: 0.4.6-1
+    source:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/jackal_firmware.git
+      version: noetic_devel
+    status: developed
+  jackal_robot:
+    doc:
+      type: git
+      url: https://github.com/jackal/jackal_robot.git
+      version: noetic-devel
+    release:
+      packages:
+      - jackal_base
+      - jackal_bringup
+      - jackal_robot
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/jackal_robot-release.git
+      version: 0.7.9-1
+    source:
+      type: git
+      url: https://github.com/jackal/jackal_robot.git
+      version: noetic-devel
+    status: maintained
+  jackal_simulator:
+    doc:
+      type: git
+      url: https://github.com/jackal/jackal_simulator.git
+      version: melodic-devel
+    release:
+      packages:
+      - jackal_gazebo
+      - jackal_simulator
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/jackal_simulator-release.git
+      version: 0.4.0-4
+    source:
+      type: git
+      url: https://github.com/jackal/jackal_simulator.git
+      version: melodic-devel
+    status: developed
+  launch_delay:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/launch_delay-gbp.git
+      version: 0.1.0-1
+    status: maintained
+  lockmount_description:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/lockmount_description.git
+      version: main
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/lockmount_description-release.git
+      version: 0.0.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/lockmount_description.git
+      version: main
+    status: maintained
+  microhard_snmp:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/microhard_snmp-gbp.git
+      version: 0.0.2-1
+    status: maintained
+  numato_relay_interface:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/numato_relay_interface.git
+      version: main
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/numato_relay_interface-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/numato_relay_interface.git
+      version: main
+    status: maintained
+  occupancy_grid_utils:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/occupancy_grid_utils-release.git
+      version: 0.1.0-1
+    status: maintained
+  piksi_rtk_msgs:
+    release:
+      packages:
+      - earth_rover_piksi
+      - piksi_multi_rtk
+      - piksi_rtk_msgs
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/earth_rover_piksi-release.git
+      version: 1.8.3-1
+  ptz_action_server:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/ptz_action_server.git
+      version: main
+    release:
+      packages:
+      - axis_ptz_action_server
+      - ptz_action_server_msgs
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/ptz_action_server-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/ptz_action_server.git
+      version: main
+    status: maintained
+  puma_motor_driver:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/puma_motor_driver.git
+      version: master
+    release:
+      packages:
+      - puma_motor_driver
+      - puma_motor_msgs
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/puma_motor_driver-release.git
+      version: 0.3.1-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/puma_motor_driver.git
+      version: master
+    status: maintained
+  ridgeback:
+    doc:
+      type: git
+      url: https://github.com/ridgeback/ridgeback.git
+      version: melodic-devel
+    release:
+      packages:
+      - ridgeback_control
+      - ridgeback_description
+      - ridgeback_msgs
+      - ridgeback_navigation
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/ridgeback-release.git
+      version: 0.3.3-2
+    source:
+      type: git
+      url: https://github.com/ridgeback/ridgeback.git
+      version: melodic-devel
+    status: maintained
+  ridgeback_desktop:
+    doc:
+      type: git
+      url: https://github.com/ridgeback/ridgeback_desktop.git
+      version: melodic-devel
+    release:
+      packages:
+      - ridgeback_desktop
+      - ridgeback_viz
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/ridgeback_desktop-release.git
+      version: 0.1.3-1
+    source:
+      type: git
+      url: https://github.com/ridgeback/ridgeback_desktop.git
+      version: melodic-devel
+    status: maintained
+  ridgeback_firmware:
+    doc:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/ridgeback_firmware.git
+      version: melodic-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/ridgeback_firmware-gbp.git
+      version: 0.3.0-1
+    source:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/ridgeback_firmware.git
+      version: melodic-devel
+    status: maintained
+  ridgeback_robot:
+    doc:
+      type: git
+      url: https://github.com/ridgeback/ridgeback_robot.git
+      version: noetic-devel
+    release:
+      packages:
+      - ridgeback_base
+      - ridgeback_bringup
+      - ridgeback_robot
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/ridgeback_robot-release.git
+      version: 0.4.3-1
+    source:
+      type: git
+      url: https://github.com/ridgeback/ridgeback_robot.git
+      version: noetic-devel
+    status: maintained
+  ridgeback_simulator:
+    doc:
+      type: git
+      url: https://github.com/ridgeback/ridgeback_simulator.git
+      version: noetic-devel
+    release:
+      packages:
+      - mecanum_gazebo_plugin
+      - ridgeback_gazebo
+      - ridgeback_gazebo_plugins
+      - ridgeback_simulator
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/ridgeback_simulator-release.git
+      version: 0.2.0-1
+    source:
+      type: git
+      url: https://github.com/ridgeback/ridgeback_simulator.git
+      version: noetic-devel
+    status: maintained
+  ros_mscl:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/ros_mscl.git
+      version: master
+    release:
+      packages:
+      - mscl_msgs
+      - ros_mscl
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/ros_mscl-release.git
+      version: 1.2.9-2
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/ros_mscl.git
+      version: master
+    status: developed
+  serial:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/serial-release.git
+      version: 1.2.1-1
+  sevcon_ros:
+    doc:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/sevcon_ros.git
+      version: noetic-devel
+    release:
+      packages:
+      - sevcon_ros
+      - sevcon_traction
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/sevcon_ros-gbp.git
+      version: 0.2.1-1
+    source:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/sevcon_ros.git
+      version: noetic-devel
+    status: maintained
+  um6:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/ros-drivers-gbp/um6-release.git
+      version: 1.1.3-1
+  um7:
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/ros-drivers-gbp/um7-release.git
+      version: 0.0.6-1
+  valence_bms:
+    doc:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/valence_bms.git
+      version: kinetic-devel
+    release:
+      packages:
+      - valence_bms_driver
+      - valence_bms_msgs
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/valence_bms-gbp.git
+      version: 0.0.2-1
+    source:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/valence_bms.git
+      version: kinetic-devel
+    status: maintained
+  video_recorder:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/video_recorder.git
+      version: noetic-devel
+    release:
+      packages:
+      - audio_recorder
+      - audio_recorder_msgs
+      - video_recorder
+      - video_recorder_msgs
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/video_recorder-release.git
+      version: 0.0.5-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/video_recorder.git
+      version: noetic-devel
+    status: developed
+  warthog:
+    doc:
+      type: git
+      url: https://github.com/warthog-cpr/warthog.git
+      version: kinetic-devel
+    release:
+      packages:
+      - warthog_control
+      - warthog_description
+      - warthog_msgs
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/warthog-release.git
+      version: 0.1.7-1
+    source:
+      type: git
+      url: https://github.com/warthog-cpr/warthog.git
+      version: kinetic-devel
+    status: maintained
+  warthog_desktop:
+    doc:
+      type: git
+      url: https://github.com/warthog-cpr/warthog_desktop.git
+      version: melodic-devel
+    release:
+      packages:
+      - warthog_desktop
+      - warthog_viz
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/warthog_desktop-release.git
+      version: 0.1.1-1
+    source:
+      type: git
+      url: https://github.com/warthog-cpr/warthog_desktop.git
+      version: melodic-devel
+    status: maintained
+  warthog_firmware:
+    doc:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/warthog_firmware.git
+      version: indigo-devel
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/warthog_firmware-gbp.git
+      version: 0.1.0-1
+    source:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/warthog_firmware.git
+      version: indigo-devel
+    status: maintained
+  warthog_robot:
+    doc:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/warthog_robot.git
+      version: kinetic-devel
+    release:
+      packages:
+      - warthog_base
+      - warthog_bringup
+      - warthog_robot
+      tags:
+        release: release/noetic/{package}/{version}
+      url: http://gitlab.clearpathrobotics.com/gbp/warthog_robot-gbp.git
+      version: 0.2.3-1
+    source:
+      type: git
+      url: http://gitlab.clearpathrobotics.com/research/warthog_robot.git
+      version: kinetic-devel
+    status: maintained
+  warthog_simulator:
+    doc:
+      type: git
+      url: https://github.com/warthog-cpr/warthog_simulator.git
+      version: melodic-devel
+    release:
+      packages:
+      - warthog_gazebo
+      - warthog_simulator
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/warthog_simulator-release.git
+      version: 0.2.2-1
+    source:
+      type: git
+      url: https://github.com/warthog-cpr/warthog_simulator.git
+      version: melodic-devel
+    status: maintained
+  wibotic-ros-can-connector:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/wibotic-ros-can-connector.git
+      version: noetic-devel
+    release:
+      packages:
+      - wibotic_connector_can
+      - wibotic_msg
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/wibotic-ros-can-connector_release.git
+      version: 0.0.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/wibotic-ros-can-connector.git
+      version: noetic-devel
+    status: maintained
+  wireless:
+    doc:
+      type: git
+      url: https://github.com/clearpathrobotics/wireless.git
+      version: master
+    release:
+      packages:
+      - wireless_msgs
+      - wireless_watcher
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://github.com/clearpath-gbp/wireless-release.git
+      version: 0.1.2-1
+    source:
+      type: git
+      url: https://github.com/clearpathrobotics/wireless.git
+      version: master
+    status: maintained
+  yperio:
+    doc:
+      type: git
+      url: https://gitlab.clearpathrobotics.com/research/yperio.git
+      version: main
+    release:
+      tags:
+        release: release/noetic/{package}/{version}
+      url: https://gitlab.clearpathrobotics.com/gbp/yperio-gbp.git
+      version: 0.2.0-1
+    source:
+      type: git
+      url: https://gitlab.clearpathrobotics.com/research/yperio.git
+      version: main
+    status: developed
+type: distribution
+version: 1

@@ -1,0 +1,4 @@
+deb http://mirrors.rit.edu/ubuntu/ focal main universe
+deb http://mirrors.rit.edu/ubuntu/ focal-updates main universe
+# deb http://mirrors.rit.edu/ubuntu/ focal-backports main universe
+deb http://mirrors.rit.edu/ubuntu/ focal-security main universe
