@@ -33,12 +33,12 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Package management packages
     apt-transport-https=2.0.9 \
-    python3-pip=20.0.2-5ubuntu1.8 \
+    python3-pip=20.0.2-5ubuntu1.9 \
     \
     # Linux kernel/init packages
     initramfs-tools=0.136ubuntu6.7 \
     linux-image-generic=5.4.0.150.148 \
-    systemd-sysv=245.4-4ubuntu3.21 \
+    systemd-sysv=245.4-4ubuntu3.22 \
     \
     # Sysadmin tool packages
     git=1:2.25.1-1ubuntu3.11 \
@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     less=551-1ubuntu0.1 \
     openssh-server=1:8.2p1-4ubuntu0.7 \
     screen=4.8.0-1ubuntu0.1 \
-    vim=2:8.1.2269-1ubuntu5.14 \
+    vim=2:8.1.2269-1ubuntu5.15 \
     \
     && rm -rf /var/lib/apt/lists/*
 
