@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package>
+  <name>jackal_rfal</name>
+  <version>0.1.0</version>
+  <description>Metapackage of software to install on RFAL Jackals.</description>
+
+  <maintainer email="pszenher@stevens.edu">
+    Paul Szenher
+  </maintainer>
+  
+  <author email="pszenher@stevens.edu">
+    Paul Szenher
+  </author>
+
+  <license>
+    BSD
+  </license>
+
+  <url type="website">
+    https://github.com/pszenher/jackal-docker
+  </url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>python3-catkin-tools</run_depend>
+  <!-- <run_depend>robot</run_depend> -->
+  <run_depend>jackal_robot</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

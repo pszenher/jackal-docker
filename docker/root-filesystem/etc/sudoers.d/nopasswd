@@ -1,0 +1,2 @@
+# Allow "administrator" user to execute any command without password prompt
+administrator  ALL=(ALL) NOPASSWD: ALL

@@ -1,0 +1,6 @@
+Explanation: Upstream ROS packages for ClearPath Jackal are blocked
+Explanation: to ensure that custom-built source versions are used
+Explanation: If this is causing breakage, contact @pszenher...
+Package: ros-noetic-jackal-*
+Pin: release *
+Pin-Priority: -1

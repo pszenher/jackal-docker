@@ -23,7 +23,6 @@ RUN pip install \
 RUN ${GIT_CLONE} "https://github.com/ros/rosdistro" \
     "/tmp/rosdistro" \
     --branch "noetic/2023-06-15"
-    # --branch "humble/2023-05-30"
 
 COPY ./focal/rosdep-sources.list /etc/ros/rosdep/sources.list.d/20-default.list
 COPY ./focal/rosdistro-index-v4.yaml /tmp/rosdistro/index-custom.yaml
@@ -99,17 +98,18 @@ RUN yq -s '.[0] * .[1]' \
 COPY ./focal/clearpath-index-v4.yaml /tmp/rosdistro-clearpath/index-custom.yaml
 
 RUN rosdistro_build_cache \
-    # --preclean \
-    # --ignore-local \
     --debug \
     "file:///tmp/rosdistro-clearpath/index-custom.yaml" \
     "noetic"
+
 # Copy full cache (including clearpath) to main cache paths from index.yaml
-# FIXME:  should this be separate, rather than overriding the base cache?
+# TODO:  should this be separate, rather than overriding the base cache?
 RUN cp noetic-cache.yaml.gz /tmp/noetic-cache.yaml.gz
 
 RUN ROSDISTRO_INDEX_URL="file:///tmp/rosdistro-clearpath/index-custom.yaml" \
-    rosinstall_generator jackal_robot --rosdistro noetic --deps --tar --debug \
+    rosinstall_generator jackal_robot --rosdistro noetic --deps --tar \
+    # HACK: monkey-patch lms1xx release yaml, due to clearpath changing the name of the repo, breaking vcs...
+    | sed 's/lms1xx-release-release-noetic-lms1xx-0.3.0-2/LMS1xx-release-release-noetic-lms1xx-0.3.0-2/' \
     | vcs import /tmp/ros_ws/src
 
 RUN ROSDISTRO_INDEX_URL="file:///tmp/rosdistro/index-custom.yaml" \
@@ -126,7 +126,6 @@ RUN ROSDISTRO_INDEX_URL="file:///tmp/rosdistro/index-custom.yaml" \
     --skip-keys jackal_firmware \
     --skip-keys python3-catkin-pkg-modules \
     --skip-keys python3-rosdep-modules \
-    --skip-keys lms1xx \
     | sort \
     | sed -n 's/^ *apt-get install\( -y\)\? \([A-z0-9-]*\)$/\2/p' \
     | xargs apt-get install -y --no-install-recommends
@@ -141,11 +140,6 @@ RUN catkin build \
     --workspace "/tmp/ros_ws" \
     -DCMAKE_BUILD_TYPE=Release
 
-# # Now install (TODO: where? is this global?)
-# RUN mkdir -p "/opt/${ROS_VERSION}/${ROS_DISTRO}" && \
-#     catkin config --workspace "/tmp/ros_ws" && \
-#     catkin config && \
-#     catkin build --workspace "/tmp/ros_ws" -DCMAKE_BUILD_TYPE=Release
 
 # ====================================================================
 # | Root Filesystem Configuration                                    |
@@ -163,7 +157,7 @@ RUN cd /tmp/docker-root-overlay && \
     cp "$path" "$d"' \;
 
 # Add configuration to global setup.bash
-RUN sed -i '/^######$/i ROS_DISTRO='"${ROS_DISTRO}"  /etc/ros/setup.bash
+RUN sed -i '/^######$/i export ROS_DISTRO='"${ROS_DISTRO}"  /etc/ros/setup.bash
 
 RUN apt-get update && apt-get install \
     python-is-python3 \
@@ -190,3 +184,5 @@ WORKDIR "/home/${JACKAL_USER}"
 
 # Set default command to bash
 CMD ["/bin/bash"]
+# Use entrypoint to configure ros env when running in Docker container
+ENTRYPOINT ["/etc/ros/ros_entrypoint.sh"]

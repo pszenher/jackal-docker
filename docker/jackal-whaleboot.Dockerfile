@@ -1,4 +1,4 @@
-ARG FINAL_IMAGE=pszenher/jackal-ros-source:noetic
+ARG FINAL_IMAGE=pszenher/jackal-ros-bin:noetic
 FROM ${FINAL_IMAGE}
 
 # Return to root user (and stay there, as this image is only for
@@ -10,9 +10,12 @@ USER root
 # ================================================================
 RUN apt-get update && apt-get install -y --no-install-recommends \
     \
-    linux-virtual \
+    linux-image-virtual \
     initramfs-tools \
     systemd-sysv \
+    # TODO: probably need dbus-user-session here (as systemctl is
+    #       failing w/ "Failed to connect to bus: No such file or
+    #       directory"
     \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,34 +32,24 @@ RUN apt purge -y \
     && apt autoremove -y
 
 # Purge excessively large files (in order of increasing risk of breakage)
-RUN rm -r \
+RUN rm -rf \
     \
-    # INFO: no problem, meant to be deleted
     # TODO: copy relevant build stuff from tmp to main fs
+    # TODO: purge /etc/ros/rosdistro/!(${ROS_DISTRO}|rosdep)
     /tmp/* \
     /var/lib/apt/lists/* \
-    \
-    # WARN: may be unsafe, check rammifications of purging apt cache
     /var/cache/* \
-    \
-    # WARN: dangerous, probably a better way... downsample mesh programmatically?
-    /opt/ros/noetic/share/realsense2_description/meshes/* \
-    /opt/ros/noetic/lib/libSpinnaker.so* \
-    /opt/ros/noetic/lib/libflycapture.so* \
-    \
-    # WARN++: VERY dangerous, almost certainly a better way... dpkg-divert?
-    /usr/lib/x86_64-linux-gnu/libLLVM-12.so.1 \
-    /usr/lib/x86_64-linux-gnu/dri \
-    /usr/share/doc/* \
+    /var/log/* \
     /usr/share/icons/* \
     /usr/share/man/* \
-    /usr/share/X11/*
+    /usr/share/cmake-*/Help/*
+
+# Deduplicate copyright files in documentation system dir
+RUN hardlink -t /usr/share/doc
 
 # TODO: actually define these semantics...
 # Add whaleboot manifest to final image
 COPY focal/whaleboot-manifest.yaml /whaleboot-manifest.yaml
-
-
 
 # # NOTE:  temporary testing of whaleboot config...
 # # FIXME: remove

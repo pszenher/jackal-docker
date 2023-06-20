@@ -1,0 +1,18 @@
+%YAML 1.1
+# Whaleboot manifest file
+# see https://github.com/pszenher/whaleboot
+---
+system:
+  hostname: "jackal"
+  keep_manifest: False
+  keep_dockerenv: False
+bootloader:
+  type: "bios"
+  prog: "extlinux"
+  mbr_src: "image"
+  mbr_uri: "file:///usr/lib/syslinux/mbr/mbr.bin"
+disk:
+  type: "file"
+  size: "5G"
+  part_type: "mbr"
+version: 0
