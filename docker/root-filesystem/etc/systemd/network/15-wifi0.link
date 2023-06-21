@@ -1,0 +1,7 @@
+[Match]
+Type=wlan
+PermanentMACAddress=7c:5c:f8:3b:ac:fe
+
+[Link]
+Description=Jackal Wireless Network Interface
+Name=wifi0

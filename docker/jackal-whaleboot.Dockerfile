@@ -5,31 +5,54 @@ FROM ${FINAL_IMAGE}
 # whaleboot)
 USER root
 
+# Disable 30s resume disk search during initramfs boot phase
+RUN mkdir -p "/etc/initramfs-tools/conf.d" && \
+    echo "RESUME=none" > /etc/initramfs-tools/conf.d/no-resume.conf
+
 # ================================================================
 # |  Install Packages required for sucessful disk image flash
 # ================================================================
 RUN apt-get update && apt-get install -y --no-install-recommends \
     \
-    linux-image-virtual \
+    # Ubuntu Linux Kernel, minimal modules
+    linux-image-generic \
+    # Build initrd.img
     initramfs-tools \
+    # SystemD init system
     systemd-sysv \
-    # TODO: probably need dbus-user-session here (as systemctl is
-    #       failing w/ "Failed to connect to bus: No such file or
-    #       directory"
+    # Needed for user systemctl invocation
+    dbus-user-session \
+    # ip command suite
+    iproute2 \
+    # wifi authentication utils
+    wpasupplicant \
+    # sshd
+    openssh-server \
+    # pci & usb utils
+    pciutils \
+    usbutils \
+    # bluetooth utils
+    bluez \
     \
     && rm -rf /var/lib/apt/lists/*
 
+RUN systemctl enable systemd-networkd && \
+    # Enable wpa_supplicant auth on wifi0 dev
+    systemctl enable wpa_supplicant@wifi0 && \
+    umount /etc/resolv.conf && \
+    # Enable systemd-resolved DNS handling
+    ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
 # ================================================================
 # |  Slash and Burn (disk-size) Agriculture
 # ================================================================
 
 # Purge unnecessary development packages
-RUN apt purge -y \
+RUN apt-get purge -y \
     \
     git \
     \
-    && apt autoremove -y
+    && apt-get autoremove -y
 
 # Purge excessively large files (in order of increasing risk of breakage)
 RUN rm -rf \

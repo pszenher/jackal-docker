@@ -1,0 +1,7 @@
+[Match]
+Type=ether
+PermanentMACAddress=c4:00:ad:07:f5:bb
+
+[Link
+Description=Sensor Data Jackal Ethernet Port
+Name=sensor0

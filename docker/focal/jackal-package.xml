@@ -23,6 +23,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>python3-catkin-tools</run_depend>
+  <run_depend>rosbash</run_depend>
   <!-- <run_depend>robot</run_depend> -->
   <run_depend>jackal_robot</run_depend>
 

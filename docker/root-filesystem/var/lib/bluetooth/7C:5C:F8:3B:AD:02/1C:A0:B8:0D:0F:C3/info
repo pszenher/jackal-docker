@@ -1,0 +1,37 @@
+# DualShock4 Red Controller Config
+# Model:   CUH-ZCT2U
+# Serial:  39211870003769
+
+[General]
+# Broadcasted Name of DS4
+Name=Wireless Controller
+# Bluetooth Device Class:  Gamepad/Joystick
+Class=0x002508
+# Bluetooth Type:  Basic Rate/Enhanced Data Rate (not Low-Energy)
+SupportedTechnologies=BR/EDR;
+# Bluetooth Trust Status:  Manually enabled (device does not have pin)
+Trusted=true
+# Bluetooth Blocked Status:  Not blocked
+Blocked=false
+# Bluetooth Services:
+#   1. HID (human interface device)
+#   2. PnP (plug-and-play device)
+Services=00001124-0000-1000-8000-00805f9b34fb;00001200-0000-1000-8000-00805f9b34fb;
+
+[DeviceID]
+# Assigner of Device ID
+Source=2
+# Vendor ID:  1356 -dec2hex-> 054C == "Sony Corp."
+Vendor=1356
+# Product ID: 2508 -dec2hex-> 09CC == "DualShock 4 [CUH-ZCT2x]"
+Product=2508
+# Device Version
+Version=256
+
+[LinkKey]
+# Device-specific linking key (Key in hexadecimal format)
+Key=4E46766BEA556E3104F7B3ECB18DB445
+# Type of link key
+Type=4
+# Length of PIN
+PINLength=0

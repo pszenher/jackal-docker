@@ -46,7 +46,7 @@ sed -i 's/\(.*urg_node.*\)/<!-- NOTE: rfal remove \1 -->/' "${target}"
 # 
 # FIXME: diff_drive_controller needed for jackal_velocity_controller
 #        to come up, re-add and test...
-sed -i 's/\(.*diff_drive_controller.*\)/<!-- NOTE: rfal remove \1 -->/' "${target}"
+# sed -i 's/\(.*diff_drive_controller.*\)/<!-- NOTE: rfal remove \1 -->/' "${target}"
 sed -i 's/\(.*move_base.*\)/<!-- NOTE: rfal remove \1 -->/' "${target}"
 # # Control
 # sed -i 's/\(.*joy.*\)/<!-- NOTE: rfal remove \1 -->/' "${target}"
