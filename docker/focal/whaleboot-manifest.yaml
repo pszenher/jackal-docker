@@ -8,12 +8,12 @@ system:
   files:
     etc:
       hostname: "jackal"
-      hosts: |
-        127.0.0.1	localhost
-        127.0.1.1	${hostname}
-      hosts:
-        - "127.0.0.1	localhost"
-        - "127.0.1.1	${hostname}"
+      # hosts: |
+      #   127.0.0.1	localhost
+      #   127.0.1.1	${hostname}
+      # hosts:
+      #   - "127.0.0.1	localhost"
+      #   - "127.0.1.1	${hostname}"
       hosts:
         type: "file"
         path: "/tmp/hosts.whaleboot"
@@ -26,41 +26,44 @@ system:
   #   mbr: "/usr/lib/syslinux/mbr/mbr.bin"
   bootloader:
     program: "grub"
-    type: "efi"
-    esp:
-      name: "efiroot"
-    root:
-      name: "rootfs"
-    grub.cfg:
-      - set: "default=0"
-      - set: "timeout=0"
-      - menuentry:
-          title: "WhaleBoot"
-          commands:
-            - name: "search"
-              args:
-                - "--no-floppy"
-                - "--set=root"
-                - "--label whaleboot-root"
-            - name: "kernel"
-              args:
-                - "/boot/vmlinuz"
-                - "rw console=tty0 console=ttyS0,115200"
-            - name: "initrd"
-              args:
-                - "/boot/initrd.img"
-    efi-binary-path: "/usr/lib/grub/x86_64-efi/monolithic/grubx64.efi"
-    efi-install-path: "/EFI/BOOT/BOOTX64.EFI"
+    mode: "efi"
+    eficonfig: 
+      efi-partition:
+        name: "efiroot"
+      root-partition:
+        name: "rootfs"
+      efi-srcpath: "/usr/lib/grub/x86_64-efi/monolithic/grubx64.efi"
+      efi-installpath: "/EFI/BOOT/BOOTX64.EFI"
+    grubconfig:
+      set:
+        - "default=0"
+        - "timeout=0"
+      menuentries:
+          - title: "WhaleBoot"
+            commands:
+              - name: "search"
+                args:
+                  - "--no-floppy"
+                  - "--set=root"
+                  - "--label whaleboot-root"
+              - name: "kernel"
+                args:
+                  - "/boot/vmlinuz"
+                  - "rw console=tty0 console=ttyS0,115200"
+              - name: "initrd"
+                args:
+                  - "/boot/initrd.img"
 disk:
   partitiontable:
     # unit: "sectors"
     label: "gpt"
-    label-id: null
-    # first-lba: null
-    # last-lba: null
-    # table-length: null
+    id: "f9a7f215-32e0-4787-a37d-ab5144d6d7eb"
+    device: null
+    # firstlba: null
+    # lastlba: null
+    # tablelength: null
     # grain: "1MiB"
-    # sector-size: null
+    # sectorsize: null
     partitions:
       - start: "-"
         size: "1MiB"
@@ -78,12 +81,10 @@ disk:
         type: "Linux"     # Linux; means 83 for MBR and 0FC63DAF-8483-4772-8E79-3D69D8477DE4 for GPT.
   filesystems:
     - partlabel: "efiroot"
-      type:
-        id: "fat"
-        fat-size: "32"
-        fat-label: "EFI"
+      type: "fat"
+      fat-size: 32
+      fat-label: "EFI"
     - partlabel: "rootfs"
-      type:
-        id: "ext4"
-        ext4-label: "whaleboot-root"
+      type: "ext4"
+      ext4-label: "whaleboot-root"
 version: 0
