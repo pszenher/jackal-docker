@@ -16,12 +16,15 @@ ${qemu_bin} -nographic \
 	    -cpu     ${qemu_cpu_type}     \
 	    -smp sockets=1,cpus=4,cores=2 \
 	    -m 2G \
-	    -drive file="${qemu_hdd_file}" \
 	    -serial mon:stdio \
+	    \
 	    \
 	    -device pcie-pci-bridge,id=br1,bus=pcie.0,addr=1 \
 	    -device pcie-pci-bridge,id=br2,bus=pcie.0,addr=2 \
 	    -device pcie-pci-bridge,id=br3,bus=pcie.0,addr=3 \
+	    \
+	    -drive file="${qemu_hdd_file}",if=none,id=hd0 \
+	    -device virtio-blk-pci,drive=hd0,bootindex=1 \
 	    \
 	    -device e1000,id=nic0,netdev=net0,bus=br1,addr=0,acpi-index=1,mac="c4:00:ad:07:f5:bb" \
 	    -device e1000,id=nic1,netdev=net1,bus=br3,addr=0,acpi-index=0,mac="c4:00:ad:07:f5:bc" \
@@ -37,3 +40,5 @@ ${qemu_bin} -nographic \
 # -device pcie-root-port,id=rp30,bus=pcie.3,chassis=0,slot=1,addr=3.0
 
 # -netdev socket,id=net0,udp=127.0.0.1:2368,localaddr=127.0.0.1:23680 \
+
+# -pflash "ovmf_x64.bin" \
