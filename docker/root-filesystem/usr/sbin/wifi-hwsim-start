@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -o errexit -o pipefail -o nounset
+
+modprobe mac80211_hwsim radios=1
+ip link set dev wlan0 address 7c:5c:f8:3b:ac:fe
+ip link set wlan0 name wifi0

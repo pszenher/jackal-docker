@@ -1,0 +1,11 @@
+[Unit]
+Description=Virtual WLAN mac80211_hwsim Device
+Before=network.target
+ConditionVirtualization=True
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/wifi-hwsim-start
+
+[Install]
+WantedBy=multi-user.target

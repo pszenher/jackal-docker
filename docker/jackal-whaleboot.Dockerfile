@@ -38,10 +38,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN systemctl enable systemd-networkd && \
     # Enable wpa_supplicant auth on wifi0 dev
-    systemctl enable wpa_supplicant@wifi0
-    # && \
-    # # Enable systemd-resolved DNS handling
-    # ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+    systemctl enable wpa_supplicant@wifi0 && \
+    # Enable wifi hwsim when running in vm
+    systemctl enable mac80211_hwsim
 
 # ================================================================
 # |  Slash and Burn (disk-size) Agriculture
