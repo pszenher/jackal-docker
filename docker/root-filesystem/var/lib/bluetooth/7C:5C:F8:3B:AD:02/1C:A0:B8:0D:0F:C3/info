@@ -30,7 +30,7 @@ Version=256
 
 [LinkKey]
 # Device-specific linking key (Key in hexadecimal format)
-Key=4E46766BEA556E3104F7B3ECB18DB445
+Key=F286C68E021E6ACFB28FBD62A1731C8C
 # Type of link key
 Type=4
 # Length of PIN
