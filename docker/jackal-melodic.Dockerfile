@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Linux kernel/init packages
     initramfs-tools=0.130ubuntu3.13 \
-    linux-image-generic=4.15.0.212.195 \
+    linux-image-generic=4.15.0.213.196 \
     systemd-sysv=237-3ubuntu10.57 \
     \
     # Sysadmin tool packages
@@ -67,12 +67,12 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python-rosinstall=0.7.8-1 \
     python-rosinstall-generator=0.1.23-1 \
     python-wstool=0.1.17-1 \
-    ros-melodic-robot=1.4.1-0bionic.20230302.132118 \
+    ros-melodic-robot=1.4.1-0bionic.20230620.175152 \
     ros-melodic-ros-base=1.4.1-0bionic.20230215.205719 \
     \
     # Jackal Clearpath Packages
     python-ds4drv=0.5.8-bionic \
-    ros-melodic-jackal-robot=0.6.4-1bionic.20220217.114645 \
+    ros-melodic-jackal-robot=0.6.5-1bionic.20230706.015401 \
     \
     && rm -rf /var/lib/apt/lists/*
 
