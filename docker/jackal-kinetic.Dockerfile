@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     curl=7.47.0-1ubuntu2.19 \
     dhcpcd5=6.10.1-1 \
     gnupg2=2.1.11-6ubuntu2.1 \
-    software-properties-common=0.96.20.10 \
+    software-properties-common=0.96.20.13 \
     \
     # Package management packages
     apt-transport-https=1.2.35 \
@@ -72,7 +72,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Jackal Clearpath Packages
     python-ds4drv=0.5.2xenial \
-    ros-kinetic-jackal-robot=0.5.1-1xenial-20220217-061115-0500 \
+    ros-kinetic-jackal-robot=0.5.1-1xenial-20230705-115510-0500 \
     \
     && rm -rf /var/lib/apt/lists/*
 
