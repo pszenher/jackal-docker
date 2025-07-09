@@ -24,29 +24,29 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # System packages
     build-essential=12.8ubuntu1.1 \
-    ca-certificates=20230311ubuntu0.20.04.1 \
-    curl=7.68.0-1ubuntu2.18 \
+    ca-certificates=20240203~20.04.1 \
+    curl=7.68.0-1ubuntu2.25 \
     dhcpcd5=7.1.0-2build1 \
-    gnupg=2.2.19-3ubuntu2.2 \
+    gnupg=2.2.19-3ubuntu2.5 \
     python-is-python3=3.8.2-4 \
-    software-properties-common=0.99.9.11 \
+    software-properties-common=0.99.9.12 \
     \
     # Package management packages
-    apt-transport-https=2.0.9 \
-    python3-pip=20.0.2-5ubuntu1.9 \
+    apt-transport-https=2.0.11 \
+    python3-pip=20.0.2-5ubuntu1.11 \
     \
     # Linux kernel/init packages
-    initramfs-tools=0.136ubuntu6.7 \
-    linux-image-generic=5.4.0.150.148 \
-    systemd-sysv=245.4-4ubuntu3.22 \
+    initramfs-tools=0.136ubuntu6.8 \
+    linux-image-generic=5.4.0.216.208 \
+    systemd-sysv=245.4-4ubuntu3.24 \
     \
     # Sysadmin tool packages
-    git=1:2.25.1-1ubuntu3.11 \
+    git=1:2.25.1-1ubuntu3.14 \
     htop=2.2.0-2build1 \
-    less=551-1ubuntu0.1 \
-    openssh-server=1:8.2p1-4ubuntu0.7 \
+    less=551-1ubuntu0.3 \
+    openssh-server=1:8.2p1-4ubuntu0.13 \
     screen=4.8.0-1ubuntu0.1 \
-    vim=2:8.1.2269-1ubuntu5.15 \
+    vim=2:8.1.2269-1ubuntu5.32 \
     \
     && rm -rf /var/lib/apt/lists/*
 
@@ -61,19 +61,19 @@ RUN echo "deb ${ROS_URL}/ros/ubuntu/ focal main" > /etc/apt/sources.list.d/ros-l
 RUN apt-get update && apt-get install --no-install-recommends -y \
     \
     # Jackal ROS Packages
-    python3-catkin-tools=0.9.2-1 \
+    python3-catkin-tools=0.9.4-1 \
     python3-osrf-pycommon=2.0.2-1 \
-    python3-rosdep=0.22.2-1 \
+    python3-rosdep=0.25.1-1 \
     python3-rosinstall=0.7.8-4 \
     python3-rosinstall-generator=0.1.23-1 \
     python3-wstool=0.1.18-2 \
-    ros-noetic-robot=1.5.0-1focal.20230306.094205 \
-    ros-noetic-ros-base=1.5.0-1focal.20230216.010618 \
+    ros-noetic-robot=1.5.0-1focal.20250521.012857 \
+    ros-noetic-ros-base=1.5.0-1focal.20250521.010531 \
     \
     # Jackal Clearpath Packages
     python-ds4drv=0.6.10-focal \
-    ros-noetic-jackal-base=0.7.7-1focal.20230107.015635 \
-    ros-noetic-jackal-bringup=0.7.7-1focal.20230107.015950 \
+    ros-noetic-jackal-base=0.7.11-1focal.20250416.192445 \
+    ros-noetic-jackal-bringup=0.7.11-1focal.20250416.192741 \
     \
     && rm -rf /var/lib/apt/lists/*
 
